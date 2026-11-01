@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1f4fd8">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="P2P USDT">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>حاسبة P2P USDT</title>
+<style>
+  :root {
+    --paper:#eef2f7; --card:#fff; --ink:#13233f; --muted:#5d6b82; --line:#d3dbe7;
+    --accent:#1f4fd8; --accent-ink:#fff; --result:#fff4cc; --result-ink:#3d2d00;
+    --second:#e3ecff; --second-ink:#10265c; --manual:#fff0d6; --danger:#b3261e;
+    --lossbg:#fde4e1; --gain:#13795b; --tagbuy:#dfe8ff; --tagbuy-ink:#17389a; --tagsell:#d9f3e8; --tagsell-ink:#0d5a43;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper:#0e1626; --card:#16213a; --ink:#e8eefb; --muted:#9aa9c4; --line:#2b3a5c;
+      --accent:#7da2ff; --accent-ink:#0e1626; --result:#3a2f0a; --result-ink:#ffe9a3;
+      --second:#1d2c52; --second-ink:#d6e3ff; --manual:#3a2f0a; --danger:#ff8a80;
+      --lossbg:#3b1714; --gain:#4fd1a1; --tagbuy:#1d2c52; --tagbuy-ink:#bcd0ff; --tagsell:#12382d; --tagsell-ink:#9ff0cf; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink);
+    font-family:"Noto Sans Arabic","Segoe UI",Tahoma,system-ui,sans-serif; line-height:1.6; -webkit-text-size-adjust:100%; }
+  main { max-width:620px; margin:0 auto; padding:16px 14px 48px; }
+  .head { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  h1 { font-size:1.25rem; margin:6px 0 4px; }
+  h2 { font-size:1rem; margin:0 0 8px; }
+  .info { display:inline-flex; align-items:center; justify-content:center; vertical-align:middle;
+    width:13px; height:13px; padding:0; margin-inline-end:5px; border:1.3px solid currentColor; border-radius:50%;
+    background:transparent; color:inherit; opacity:.7; font-size:.55rem; font-weight:800; line-height:1; position:relative; }
+  .info::after { content:""; position:absolute; inset:-8px; }
+  .info:hover, .info[aria-expanded="true"] { opacity:1; }
+  .tabcell { position:relative; }
+  .tabcell > button:not(.info) { width:100%; padding-right:24px; }
+  .tabcell > #tabTarget { font-size:clamp(.85rem, 4vw, 1rem); white-space:normal; line-height:1.3; text-wrap:balance; }
+  .tabcell > .info { position:absolute; right:6px; top:50%; margin:0; transform:translateY(-50%); z-index:2; color:var(--muted); }
+  #settingsBtn { font-size:1.2rem; line-height:1; padding:7px 12px; }
+  #settingsBtn[aria-expanded="true"] { background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
+  .headact { display:flex; align-items:center; gap:6px; }
+  .tip { position:fixed; z-index:60; max-width:min(300px, calc(100vw - 24px)); background:var(--ink); color:var(--paper);
+    border-radius:12px; padding:12px 14px; box-shadow:0 8px 26px rgba(0,0,0,.3); animation:tipIn .16s ease-out; }
+  .tip .tt { font-weight:800; font-size:.92rem; margin-bottom:4px; }
+  .tip .td { font-size:.86rem; line-height:1.6; opacity:.95; }
+  @keyframes tipIn { from { opacity:0; transform:scale(.96); } to { opacity:1; transform:none; } }
+  .sh { font-size:.95rem; margin:18px 0 8px; padding-top:14px; border-top:1px solid var(--line); }
+  .sh:first-child { margin-top:0; padding-top:0; border-top:0; }
+  .switch { display:flex; align-items:center; gap:12px; margin:16px 0 8px; cursor:pointer; font-size:.95rem; }
+  .switch input { position:absolute; opacity:0; width:1px; height:1px; }
+  .slider { direction:ltr; position:relative; flex:0 0 46px; width:46px; height:26px; border-radius:26px; background:var(--line); transition:background .2s; }
+  .slider::after { content:""; position:absolute; top:3px; left:3px; width:20px; height:20px; border-radius:50%; background:#fff;
+    box-shadow:0 1px 3px rgba(0,0,0,.3); transition:transform .2s; }
+  .switch input:checked + .slider { background:var(--accent); }
+  .switch input:checked + .slider::after { transform:translateX(20px); }
+  .switch input:focus-visible + .slider { outline:3px solid var(--accent); outline-offset:2px; }
+  #bmTable { transition:opacity .2s; }
+  #bmTable.off { opacity:.4; }
+  .seg { display:flex; gap:6px; }
+  .seg button { flex:1; border:1px solid var(--line); background:var(--paper); color:var(--ink); border-radius:10px; padding:9px 6px; font-weight:700; }
+  .seg button[aria-pressed="true"] { background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
+  [hidden] { display:none !important; }
+  button, input { touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
+  button { transition:transform .12s ease, background-color .15s, opacity .15s; }
+  .btn:active:not(:disabled), .btn2:active { transform:scale(.97); }
+  .stp:active { transform:scale(.92); }
+  input { transition:border-color .15s, background-color .2s, box-shadow .15s; }
+  input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(31,79,216,.18); }
+  .page-in { animation:pageIn .24s ease-out; }
+  @keyframes pageIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+  .bump { display:inline-block; animation:bump .32s ease-out; }
+  @keyframes bump { from { opacity:.35; transform:translateY(5px) scale(.97); } to { opacity:1; transform:none; } }
+  #topReal, #topSell, #curReal { display:inline-block; }
+  tr.new td { animation:rowFlash 1.1s ease-out; }
+  @keyframes rowFlash { from { background:var(--result); } to { background:transparent; } }
+  .toast { position:fixed; left:50%; bottom:22px; z-index:50; transform:translate(-50%, 16px); opacity:0; pointer-events:none;
+    background:var(--ink); color:var(--paper); padding:10px 18px; border-radius:24px; font-weight:700; font-size:.92rem;
+    box-shadow:0 6px 20px rgba(0,0,0,.25); transition:opacity .22s, transform .22s; }
+  .toast.show { opacity:1; transform:translate(-50%, 0); }
+  @media (prefers-reduced-motion: reduce) { * { animation:none !important; transition:none !important; } }
+  .topbar { position:sticky; top:0; z-index:10; display:grid; grid-template-columns:1.15fr 1fr 1fr; gap:6px;
+    background:var(--paper); padding:8px 0 10px; margin-bottom:2px; }
+  .tb { border-radius:12px; padding:8px 12px; }
+  .tb.a { background:var(--second); color:var(--second-ink); }
+  .tb.b { background:var(--result); color:var(--result-ink); }
+  .tb { padding:8px 9px; min-width:0; }
+  .tb.g { background:var(--card); border:1px solid var(--accent); color:var(--ink); }
+  .tb.g label { margin:0 0 4px; color:var(--muted); }
+  .tb.g input { font-size:1.15rem; font-weight:700; padding:6px 6px; border-radius:8px; }
+  .tb.g .stp-col { flex-basis:30px; }
+  .tb.g .stepper { gap:4px; }
+  .tb .name { font-size:.72rem; opacity:.9; line-height:1.3; }
+  .tb .val { font-size:1.3rem; font-weight:800; line-height:1.25; direction:ltr; text-align:right; font-variant-numeric:tabular-nums; }
+  .tb .unit { font-size:.78rem; font-weight:600; }
+  .tabs { position:relative; display:grid; grid-template-columns:repeat(3,1fr); gap:6px; background:var(--line); padding:4px; border-radius:12px; margin:8px 0 4px; }
+  .tabs::before { content:""; position:absolute; top:4px; bottom:4px; right:4px; width:calc((100% - 20px) / 3);
+    background:var(--card); border-radius:9px; box-shadow:0 1px 2px rgba(19,35,63,.2);
+    transform:translateX(calc(var(--idx, 0) * -1 * (100% + 6px))); transition:transform .28s cubic-bezier(.3,.8,.3,1); }
+  .tabs button:not(.info) { position:relative; z-index:1; border:0; background:transparent; color:var(--muted); font-weight:700; padding:10px 6px; border-radius:9px; transition:color .2s; }
+  .tabs button[aria-selected="true"] { color:var(--ink); }
+  .panel { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px; margin-top:12px; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .grid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  .wide { grid-column:1 / -1; }
+  label { display:block; font-size:.85rem; color:var(--muted); margin-bottom:4px; }
+  input[type=text], input:not([type]) { width:100%; font:inherit; font-size:1.05rem; color:var(--ink); background:var(--paper);
+    border:1px solid var(--line); border-radius:10px; padding:10px 12px; direction:ltr; text-align:right; }
+  .stepper { display:flex; direction:ltr; gap:6px; align-items:stretch; }
+  .stepper input { flex:1; min-width:0; text-align:right; }
+  .stp-col { flex:0 0 40px; display:flex; flex-direction:column; gap:3px; }
+  .stp { flex:1; min-height:20px; border:1px solid var(--line); background:var(--paper); color:var(--ink); border-radius:7px;
+    font-size:.72rem; line-height:1; padding:0; user-select:none; -webkit-user-select:none;
+    -webkit-touch-callout:none; touch-action:manipulation; }
+  .stp:active { background:var(--second); }
+  input.manual { background:var(--manual); border-color:var(--accent); }
+  .small label { font-size:.74rem; line-height:1.3; min-height:2.4em; }
+  .small input { font-size:.92rem; padding:7px 8px; }
+  .hint { font-size:.76rem; color:var(--muted); margin:8px 0 0; }
+  :focus-visible { outline:3px solid var(--accent); outline-offset:2px; }
+  .res { border-radius:14px; padding:16px; margin-top:12px; }
+  .res.a { background:var(--second); color:var(--second-ink); }
+  .res.b { background:var(--result); color:var(--result-ink); }
+  .res .name { font-size:.9rem; opacity:.9; }
+  .res .big { font-size:2.3rem; font-weight:800; line-height:1.2; direction:ltr; text-align:right; font-variant-numeric:tabular-nums; }
+  .res .unit { font-size:.9rem; font-weight:600; }
+  .res.mid { padding:12px 14px; margin-top:8px; }
+  .res.mid .big { font-size:1.7rem; }
+  dl { margin:0; }
+  .row { display:flex; justify-content:space-between; gap:12px; padding:7px 0; border-top:1px solid var(--line); font-size:.92rem; }
+  .row:first-child { border-top:0; }
+  .row dt { color:var(--muted); }
+  .row dd { margin:0; font-weight:600; direction:ltr; font-variant-numeric:tabular-nums; }
+  .gain { color:var(--gain); } .loss { color:var(--danger); }
+  button { font:inherit; cursor:pointer; }
+  .btn { background:var(--accent); color:var(--accent-ink); border:0; border-radius:10px; padding:11px 16px; font-weight:700; width:100%; margin-top:12px; }
+  .btn:disabled { opacity:.45; cursor:not-allowed; }
+  .btn2 { background:transparent; color:var(--ink); border:1px solid var(--line); border-radius:9px; padding:7px 12px; font-size:.85rem; }
+  .logbar { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+  .scroll { overflow-x:auto; margin-top:8px; -webkit-overflow-scrolling:touch; }
+  table { width:100%; border-collapse:collapse; font-size:.84rem; white-space:nowrap; }
+  th,td { padding:8px 8px; text-align:right; border-top:1px solid var(--line); }
+  th { font-size:.74rem; color:var(--muted); border-top:0; font-weight:600; }
+  td.n { direction:ltr; font-variant-numeric:tabular-nums; }
+  td.key { font-weight:700; }
+  td input[type=checkbox] { width:20px; height:20px; padding:0; accent-color:var(--accent); }
+  tr.off td { opacity:.45; }
+  .tag { display:inline-block; padding:1px 10px; border-radius:20px; font-weight:700; font-size:.78rem; }
+  .tag.buy { background:var(--tagbuy); color:var(--tagbuy-ink); }
+  .tag.sell { background:var(--tagsell); color:var(--tagsell-ink); }
+  .x { background:transparent; border:0; color:var(--danger); font-size:1.05rem; padding:2px 8px; }
+  .cells { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px; }
+  .cell { border-radius:12px; padding:10px 12px; min-width:0; }
+  .cell .name { font-size:.78rem; opacity:.9; line-height:1.3; }
+  .cell .val { font-size:1.4rem; font-weight:800; line-height:1.3; direction:ltr; text-align:right; font-variant-numeric:tabular-nums; }
+  .cell .unit { font-size:.78rem; font-weight:600; }
+  .cell.c1 { background:var(--second); color:var(--second-ink); }
+  .cell.c2 { background:var(--result); color:var(--result-ink); }
+  .cell.c3 { background:var(--paper); border:1px solid var(--line); color:var(--ink); }
+  .cell.c4 { background:var(--tagsell); color:var(--tagsell-ink); }
+  .cell.c5 { background:var(--lossbg); color:var(--danger); }
+  details { margin-top:12px; } summary { cursor:pointer; font-weight:600; padding:6px 0; }
+  td .sub { display:block; font-size:.68rem; color:var(--muted); font-weight:400; }
+  tr.cur td { background:var(--result); color:var(--result-ink); }
+  tr.cur td .sub { color:var(--result-ink); opacity:.75; }
+  .empty { color:var(--muted); padding:14px 2px; }
+
+  .head { position:relative; }
+  .menu { position:absolute; top:calc(100% + 4px); inset-inline-end:0; z-index:30; min-width:220px; padding:6px;
+    background:var(--card); border:1px solid var(--line); border-radius:12px; box-shadow:0 10px 28px rgba(0,0,0,.22); animation:pageIn .16s ease-out; }
+  .menu button { display:flex; width:100%; align-items:center; justify-content:space-between; gap:14px; padding:11px 12px;
+    border:0; border-radius:8px; background:transparent; color:var(--ink); font-weight:600; text-align:start; }
+  .menu button:hover, .menu button:active { background:var(--paper); }
+  .menu small { color:var(--muted); font-weight:700; }
+  .spage { position:fixed; inset:0; z-index:40; display:flex; flex-direction:column; background:var(--paper); animation:pageIn .22s ease-out; }
+  .sbar { display:flex; align-items:center; gap:10px; padding:12px 14px; background:var(--card); border-bottom:1px solid var(--line); }
+  .sbar h2 { margin:0; font-size:1.05rem; }
+  .backbtn { display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; padding:0; border:1px solid var(--line);
+    border-radius:10px; background:var(--paper); color:var(--ink); }
+  html[dir="rtl"] .backbtn svg { transform:scaleX(-1); }
+  .sbody { flex:1; overflow:auto; width:100%; max-width:620px; margin:0 auto; padding:16px 14px; -webkit-overflow-scrolling:touch; }
+  .sfoot { display:flex; gap:10px; padding:12px 14px calc(12px + env(safe-area-inset-bottom)); background:var(--card); border-top:1px solid var(--line); }
+  .sfoot .btn { margin-top:0; width:auto; flex:1.5; }
+  .sfoot .btn2 { flex:1; padding:10px 8px; font-size:.9rem; }
+  .res, .tb { position:relative; }
+  /* محاذاة: العنوان في الأعلى والقيمة/الخانة في الأسفل، فتصطف الأرقام مهما اختلف طول العناوين */
+  .grid > div { display:flex; flex-direction:column; justify-content:flex-end; }
+  .grid > div > label { margin-bottom:5px; }
+  .tb { display:flex; flex-direction:column; justify-content:space-between; }
+  .cell { display:flex; flex-direction:column; justify-content:space-between; }
+  .mini input:not([type]), .ro { height:40px; padding:0 9px; box-sizing:border-box; }
+  .mini .stp { min-height:17px; }
+  .copy-btn { position:absolute; top:8px; inset-inline-end:8px; width:26px; height:26px; padding:0; display:inline-flex;
+    align-items:center; justify-content:center; border:1.3px solid currentColor; border-radius:8px; background:transparent;
+    color:inherit; opacity:.65; }
+  .copy-btn:hover, .copy-btn:active { opacity:1; }
+  .copy-btn svg { display:block; }
+  .tb .copy-btn { top:6px; inset-inline-end:6px; width:22px; height:22px; border-radius:7px; }
+  .tb .copy-btn svg { width:12px; height:12px; }
+  .res .name { padding-inline-end:34px; }
+  .tb.b .name { padding-inline-end:22px; }
+  .mini { margin-top:12px; }
+  .mini label { font-size:.76rem; line-height:1.3; }
+  .mini input:not([type]), .ro { font-size:.92rem; padding:7px 9px; }
+  .ro { display:flex; align-items:center; justify-content:flex-end; min-height:38px; font-weight:700; direction:ltr;
+    background:var(--paper); border:1px solid var(--line); border-radius:10px; font-variant-numeric:tabular-nums; }
+  /* ---- اتجاه LTR (الفرنسية والإنجليزية) ---- */
+  html[dir="ltr"] .tabs::before { right:auto; left:4px; transform:translateX(calc(var(--idx, 0) * (100% + 6px))); }
+  html[dir="ltr"] .tabcell > .info { right:auto; left:6px; }
+  html[dir="ltr"] .tabcell > button:not(.info) { padding-right:6px; padding-left:24px; }
+  html[dir="ltr"] input:not([type]) { text-align:left; }
+  html[dir="ltr"] .res .big, html[dir="ltr"] .cell .val, html[dir="ltr"] .tb .val { text-align:left; }
+  html[dir="ltr"] th, html[dir="ltr"] td { text-align:left; }
+  html[dir="ltr"] .ro { justify-content:flex-start; }
+  #bkRow { margin-top:14px; }
+</style>
+</head>
+<body>
+<main>
+  <header class="head">
+    <h1 data-i18n="title">حاسبة P2P USDT</h1>
+    <button type="button" class="btn2" id="settingsBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="settingsMenu" aria-label="الإعدادات" title="الإعدادات">⚙</button>
+    <div class="menu" id="settingsMenu" role="menu" hidden>
+      <button type="button" role="menuitem" data-sec="fees"><span data-i18n="menu_fees">إعدادات الرسوم</span></button>
+      <button type="button" role="menuitem" data-sec="cur"><span data-i18n="menu_cur">اختيار العملة</span><small id="menuCur"></small></button>
+      <button type="button" role="menuitem" data-sec="lang"><span data-i18n="menu_lang">اختيار اللغة</span><small id="menuLang"></small></button>
+    </div>
+  </header>
+
+  <div class="topbar">
+    <div class="tb g">
+      <label class="name" for="g"><span data-i18n="lbl_g">الربح المطلوب (دج)</span></label>
+      <input id="g" inputmode="decimal" value="2,00" autocomplete="off">
+    </div>
+    <div class="tb a" role="status" aria-live="polite">
+      <div class="name"><span data-i18n="top_real">متوسط التكلفة الفعلية</span></div>
+      <div class="val"><span id="topReal">—</span> <span class="unit" data-unit>دج</span></div>
+    </div>
+    <div class="tb b">
+      <button type="button" class="copy-btn" data-src="topSell" aria-label="نسخ القيمة"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg></button>
+      <div class="name"><span data-i18n="top_sell">متوسط سعر البيع المثالي</span></div>
+      <div class="val"><span id="topSell">—</span> <span class="unit" data-unit>دج</span></div>
+    </div>
+  </div>
+
+  <div class="tabs" id="tabs" role="tablist" aria-label="الصفحات">
+    <button role="tab" id="tabBuy" aria-selected="true" data-i18n="tab_buy">الشراء</button>
+    <button role="tab" id="tabSell" aria-selected="false" data-i18n="tab_sell">البيع</button>
+    <button role="tab" id="tabTarget" aria-selected="false" data-i18n="tab_target">سعر الشراء المستهدف</button>
+  </div>
+
+  <!-- صفحة الشراء -->
+  <section id="pageBuy">
+    <div class="panel">
+      <div class="grid">
+        <div>
+          <label for="a"><span data-i18n="lbl_a">مبلغ الشراء (دج)</span></label>
+          <input id="a" inputmode="decimal" placeholder="12800" autocomplete="off">
+        </div>
+        <div>
+          <label for="p"><span data-i18n="lbl_p">السعر المعلن (دج/USDT)</span></label>
+          <input id="p" inputmode="decimal" placeholder="255,06" autocomplete="off">
+        </div>
+      </div>
+      <div class="grid mini">
+        <div id="bkfBox" hidden>
+          <label for="bkf"><span data-i18n="lbl_bkf">رسوم التحويل البنكي</span></label>
+          <input id="bkf" inputmode="decimal" autocomplete="off">
+        </div>
+        <div>
+          <label id="netqLabel"><span data-i18n="lbl_netq">الكمية الصافية المشتراة (USDT)</span></label>
+          <div class="ro"><span id="netQ">—</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="res a" role="status" aria-live="polite">
+      <button type="button" class="copy-btn" data-src="curReal" aria-label="نسخ القيمة"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg></button>
+      <div class="name"><span data-i18n="cur_real">التكلفة الفعلية لشراء الوحدة</span></div>
+      <div class="big"><span id="curReal">—</span> <span class="unit" data-unit>دج</span></div>
+    </div>
+
+    <button class="btn" id="save" disabled data-i18n="btn_save">تسجيل عملية الشراء</button>
+  </section>
+
+  <!-- صفحة البيع -->
+  <section id="pageSell" hidden>
+    <div class="panel">
+      <div class="grid">
+        <div>
+          <label for="sq"><span data-i18n="lbl_sq">الكمية المباعة (USDT)</span></label>
+          <input id="sq" inputmode="decimal" autocomplete="off">
+        </div>
+        <div>
+          <label for="sp"><span data-i18n="lbl_sp">سعر البيع (دج/USDT)</span></label>
+          <input id="sp" inputmode="decimal" autocomplete="off">
+        </div>
+      </div>
+    </div>
+    <div id="sout"></div>
+    <button class="btn" id="ssave" disabled data-i18n="btn_ssave">تسجيل عملية البيع</button>
+  </section>
+
+  <!-- صفحة سعر الشراء المستهدف -->
+  <section id="pageTarget" hidden>
+    <div class="panel">
+      <div class="grid">
+        <div>
+          <label for="ts"><span data-i18n="lbl_ts">سعر البيع (دج/USDT)</span></label>
+          <input id="ts" inputmode="decimal" placeholder="255" autocomplete="off">
+        </div>
+        <div>
+          <label for="ta"><span data-i18n="lbl_ta">مبلغ الشراء (اختياري)</span></label>
+          <input id="ta" inputmode="decimal" placeholder="12800" autocomplete="off">
+        </div>
+      </div>
+    </div>
+    <div id="tout"></div>
+  </section>
+
+  <!-- السجل المشترك -->
+  <section class="panel" id="logs" aria-label="سجل العمليات">
+    <h2 data-i18n="log_title">سجل العمليات</h2>
+    <div id="sum"></div>
+    <div id="log"></div>
+    <div class="logbar">
+      <button class="btn2" id="copy" hidden data-i18n="copy">نسخ الجدول</button>
+      <button class="btn2" id="clear" hidden data-i18n="clear">مسح الكل</button>
+    </div>
+    <p class="hint" data-i18n="log_hint"></p>
+  </section>
+</main>
+<div class="spage" id="settingsPage" role="dialog" aria-modal="true" hidden>
+  <div class="sbar">
+    <button type="button" class="backbtn" id="setBack" aria-label="رجوع"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <h2 id="setTitle"></h2>
+  </div>
+  <div class="sbody" id="setBody">
+    <section id="secFees" hidden>
+      <div class="grid">
+        <div><label for="fb"><span data-i18n="lbl_fb">رسوم الشراء (%)</span></label><input id="fb" inputmode="decimal" value="0,2" autocomplete="off"></div>
+        <div><label for="fs"><span data-i18n="lbl_fs">رسوم البيع (%)</span></label><input id="fs" inputmode="decimal" value="0,2" autocomplete="off"></div>
+      </div>
+      <label class="switch" for="bm">
+        <input type="checkbox" id="bm" checked>
+        <span class="slider" aria-hidden="true"></span>
+        <span class="lbl" data-i18n="sw_fee">احتساب رسوم بريدي موب في الحساب</span>
+      </label>
+      <div class="scroll" id="bmTable"><table>
+        <thead><tr><th data-i18n="th_range">مجال المبلغ (دج)</th><th data-i18n="th_baridi">خصم بريدي موب</th></tr></thead>
+        <tbody id="bmBody"></tbody>
+      </table></div>
+      <div id="bkRow" hidden>
+        <label for="bk"><span data-i18n="lbl_bk">رسوم التحويل البنكي</span></label>
+        <input id="bk" inputmode="decimal" value="0,00" autocomplete="off">
+      </div>
+    </section>
+    <section id="secCur" hidden>
+      <div class="seg" id="curSeg" role="group" aria-label="العملة">
+        <button type="button" data-v="DZD" aria-pressed="true">DZD</button>
+        <button type="button" data-v="EUR" aria-pressed="false">€</button>
+        <button type="button" data-v="USD" aria-pressed="false">$</button>
+      </div>
+    </section>
+    <section id="secLang" hidden>
+      <div class="seg" id="langSeg" role="group" aria-label="اللغة">
+        <button type="button" data-v="ar" aria-pressed="true">عربي</button>
+        <button type="button" data-v="fr" aria-pressed="false">Français</button>
+        <button type="button" data-v="en" aria-pressed="false">English</button>
+      </div>
+    </section>
+  </div>
+  <div class="sfoot">
+    <button type="button" class="btn" id="setSave" data-i18n="save_settings">حفظ</button>
+    <button type="button" class="btn2" id="setReset" data-i18n="reset_settings">الإعدادات الأولى</button>
+  </div>
+</div>
+<div class="tip" id="tip" role="dialog" hidden><div class="tt"></div><div class="td"></div></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var sManual = { sq: false, sp: false };
+  var last = null, ops = [], counter = 0;
+  var baridiOn = true, lang = "ar", curr = "DZD", bfManual = false;
+
+  /* ---------- الترجمة ---------- */
+  var T = {
+    ar: {
+      menu_fees: "إعدادات الرسوم", menu_cur: "اختيار العملة", menu_lang: "اختيار اللغة", save_settings: "حفظ", reset_settings: "الإعدادات الأولى", back: "رجوع", toast_saved: "تم حفظ الإعدادات ✓",
+      lbl_bkf: "رسوم التحويل البنكي ({u})", lbl_netq: "الكمية الصافية المشتراة (USDT)", copy_value: "نسخ القيمة",
+      title: "حاسبة P2P USDT", settings: "الإعدادات", pages: "الصفحات", sec_fees: "الرسوم",
+      lbl_fb: "رسوم الشراء (%)", lbl_fs: "رسوم البيع (%)", sw_fee: "احتساب {fee} في الحساب",
+      fee_dz: "رسوم بريدي موب", fee_ot: "رسوم التحويل البنكي",
+      th_range: "مجال المبلغ ({u})", th_baridi: "خصم بريدي موب", and_above: "فما فوق",
+      lbl_bk: "رسوم التحويل البنكي ({u}، مبلغ ثابت)", sec_lang: "اللغة", sec_cur: "العملة",
+      lbl_g: "الربح المطلوب ({u})", top_real: "متوسط التكلفة الفعلية", top_sell: "متوسط سعر البيع المثالي",
+      tab_buy: "الشراء", tab_sell: "البيع", tab_target: "سعر الشراء المستهدف",
+      lbl_a: "مبلغ الشراء ({u})", lbl_p: "السعر المعلن ({u}/USDT)", cur_real: "التكلفة الفعلية لشراء الوحدة",
+      btn_save: "تسجيل عملية الشراء", lbl_sq: "الكمية المباعة (USDT)", lbl_sp: "سعر البيع ({u}/USDT)",
+      btn_ssave: "تسجيل عملية البيع", lbl_ts: "سعر البيع ({u}/USDT)", lbl_ta: "مبلغ الشراء (اختياري)",
+      log_title: "سجل العمليات", copy: "نسخ الجدول", clear: "مسح الكل",
+      log_hint: "عند فتح البرنامج في المتصفح (خارج Claude) يُحفظ السجل تلقائيًا على جهازك. داخل Claude لا يُحفظ، فاستخدم «نسخ الجدول».",
+      copied: "تم النسخ ✓", copy_fail: "تعذّر النسخ", confirm_clear: "مسح كل العمليات المسجلة؟",
+      empty_log: "لا توجد عمليات مسجلة بعد.", th_inc: "احتساب",
+      c_type: "النوع", c_time: "الوقت", c_amount: "المبلغ", c_price: "السعر الفعلي", c_net: "الكمية الصافية", c_profit: "الربح",
+      c_listed: "السعر المعلن", c_bought: "الكمية المشتراة", c_afterbuy: "بعد خصم الشراء",
+      buy: "شراء", sell: "بيع", toast_buy: "تم تسجيل عملية الشراء ✓", toast_sell: "تم تسجيل عملية البيع ✓",
+      remain: "الكمية المتبقية", profit: "الربح", sell_amount: "مبلغ البيع", sell_cost: "التكلفة (متوسط {0})", sell_profit: "الربح",
+      t_buy_at: "اشترِ عند هذا السعر أو أقل (لمبلغ {0} {u})",
+      th_fee_short: "الرسم", th_low: "عند أدنى المبلغ", th_high: "عند أعلى المبلغ", th_amount: "المبلغ ({u})", th_target: "سعر الشراء المستهدف",
+      explain: "شرح", up: "زيادة", down: "إنقاص", del_row: "حذف السطر", inc_aria: "احتساب العملية في المتوسط"
+    },
+    fr: {
+      menu_fees: "Paramètres des frais", menu_cur: "Choix de la devise", menu_lang: "Choix de la langue", save_settings: "Enregistrer", reset_settings: "Réglages initiaux", back: "Retour", toast_saved: "Réglages enregistrés ✓",
+      lbl_bkf: "Frais de virement bancaire ({u})", lbl_netq: "Quantité nette achetée (USDT)", copy_value: "Copier la valeur",
+      title: "Calculateur P2P USDT", settings: "Paramètres", pages: "Pages", sec_fees: "Frais",
+      lbl_fb: "Frais d'achat (%)", lbl_fs: "Frais de vente (%)", sw_fee: "Inclure les {fee} dans le calcul",
+      fee_dz: "frais Baridi Mob", fee_ot: "frais de virement bancaire",
+      th_range: "Tranche du montant ({u})", th_baridi: "Frais Baridi Mob", and_above: "et plus",
+      lbl_bk: "Frais de virement bancaire ({u}, montant fixe)", sec_lang: "Langue", sec_cur: "Devise",
+      lbl_g: "Profit visé ({u})", top_real: "Coût réel moyen", top_sell: "Prix de vente idéal moyen",
+      tab_buy: "Achat", tab_sell: "Vente", tab_target: "Prix d'achat cible",
+      lbl_a: "Montant d'achat ({u})", lbl_p: "Prix annoncé ({u}/USDT)", cur_real: "Coût réel d'achat par unité",
+      btn_save: "Enregistrer l'achat", lbl_sq: "Quantité vendue (USDT)", lbl_sp: "Prix de vente ({u}/USDT)",
+      btn_ssave: "Enregistrer la vente", lbl_ts: "Prix de vente ({u}/USDT)", lbl_ta: "Montant d'achat (facultatif)",
+      log_title: "Journal des opérations", copy: "Copier le tableau", clear: "Tout effacer",
+      log_hint: "Ouverte dans le navigateur (hors Claude), l'application enregistre le journal automatiquement sur votre appareil. Dans Claude, rien n'est sauvegardé : utilisez « Copier le tableau ».",
+      copied: "Copié ✓", copy_fail: "Échec de la copie", confirm_clear: "Effacer toutes les opérations enregistrées ?",
+      empty_log: "Aucune opération enregistrée.", th_inc: "Inclure",
+      c_type: "Type", c_time: "Heure", c_amount: "Montant", c_price: "Prix réel", c_net: "Quantité nette", c_profit: "Profit",
+      c_listed: "Prix annoncé", c_bought: "Quantité achetée", c_afterbuy: "Après frais d'achat",
+      buy: "Achat", sell: "Vente", toast_buy: "Achat enregistré ✓", toast_sell: "Vente enregistrée ✓",
+      remain: "Quantité restante", profit: "Profit", sell_amount: "Montant de la vente", sell_cost: "Coût (moyenne {0})", sell_profit: "Profit",
+      t_buy_at: "Achetez à ce prix ou moins (pour un montant de {0} {u})",
+      th_fee_short: "Frais", th_low: "Au montant min.", th_high: "Au montant max.", th_amount: "Montant ({u})", th_target: "Prix d'achat cible",
+      explain: "Explication", up: "Augmenter", down: "Diminuer", del_row: "Supprimer la ligne", inc_aria: "Inclure l'opération dans la moyenne"
+    },
+    en: {
+      menu_fees: "Fee settings", menu_cur: "Choose currency", menu_lang: "Choose language", save_settings: "Save", reset_settings: "Initial settings", back: "Back", toast_saved: "Settings saved ✓",
+      lbl_bkf: "Bank transfer fee ({u})", lbl_netq: "Net quantity bought (USDT)", copy_value: "Copy value",
+      title: "P2P USDT Calculator", settings: "Settings", pages: "Pages", sec_fees: "Fees",
+      lbl_fb: "Buy fee (%)", lbl_fs: "Sell fee (%)", sw_fee: "Include {fee} in the calculation",
+      fee_dz: "Baridi Mob fee", fee_ot: "bank transfer fee",
+      th_range: "Amount range ({u})", th_baridi: "Baridi Mob fee", and_above: "and above",
+      lbl_bk: "Bank transfer fee ({u}, fixed amount)", sec_lang: "Language", sec_cur: "Currency",
+      lbl_g: "Target profit ({u})", top_real: "Average real cost", top_sell: "Average ideal sell price",
+      tab_buy: "Buy", tab_sell: "Sell", tab_target: "Target buy price",
+      lbl_a: "Purchase amount ({u})", lbl_p: "Listed price ({u}/USDT)", cur_real: "Real purchase cost per unit",
+      btn_save: "Record purchase", lbl_sq: "Quantity sold (USDT)", lbl_sp: "Sell price ({u}/USDT)",
+      btn_ssave: "Record sale", lbl_ts: "Sell price ({u}/USDT)", lbl_ta: "Purchase amount (optional)",
+      log_title: "Operations log", copy: "Copy table", clear: "Clear all",
+      log_hint: "When opened in a browser (outside Claude), the log is saved automatically on your device. Inside Claude nothing is saved, so use “Copy table”.",
+      copied: "Copied ✓", copy_fail: "Copy failed", confirm_clear: "Clear all recorded operations?",
+      empty_log: "No operations recorded yet.", th_inc: "Include",
+      c_type: "Type", c_time: "Time", c_amount: "Amount", c_price: "Real price", c_net: "Net quantity", c_profit: "Profit",
+      c_listed: "Listed price", c_bought: "Quantity bought", c_afterbuy: "After buy fee",
+      buy: "Buy", sell: "Sell", toast_buy: "Purchase recorded ✓", toast_sell: "Sale recorded ✓",
+      remain: "Remaining quantity", profit: "Profit", sell_amount: "Sale amount", sell_cost: "Cost (average {0})", sell_profit: "Profit",
+      t_buy_at: "Buy at this price or lower (for an amount of {0} {u})",
+      th_fee_short: "Fee", th_low: "At lowest amount", th_high: "At highest amount", th_amount: "Amount ({u})", th_target: "Target buy price",
+      explain: "Explanation", up: "Increase", down: "Decrease", del_row: "Delete row", inc_aria: "Include operation in the average"
+    }
+  };
+
+  var TIPS = {
+    ar: {
+      bkf: ["{Fee}", "رسم التحويل لهذه العملية ({u}). يظهر تلقائيًا المبلغ المكتوب في الإعدادات، ويمكنك كتابة قيمة أخرى. يدخل في حساب التكلفة الفعلية."],
+      netq: ["الكمية الصافية المشتراة", "الكمية المشتراة (المبلغ ÷ السعر) بعد طرح رسوم الشراء ورسوم البيع. عليها تُبنى التكلفة الفعلية والربح."],
+      a: ["مبلغ الشراء", "المبلغ ({u}) الذي ترسله لشراء USDT. يُضاف إليه {fee} لحساب التكلفة الفعلية."],
+      p: ["السعر المعلن", "سعر الوحدة ({u} لكل 1 USDT) في إعلان البائع على P2P. منه تُحسب الكمية: المبلغ ÷ السعر."],
+      g: ["الربح المطلوب", "الربح الذي تريده لكل 1 USDT ({u}). يُضاف إلى التكلفة الفعلية فيعطيك سعر البيع المثالي."],
+      curReal: ["التكلفة الفعلية لشراء الوحدة", "ما تكلّفك الوحدة فعليًا بعد رسوم الشراء والبيع و{fee}: (المبلغ + الرسم) ÷ الكمية الصافية. هو أقل سعر بيع بدون ربح."],
+      topReal: ["متوسط التكلفة الفعلية", "متوسط تكلفة الوحدة في كل عمليات الشراء المحتسبة، مع العملية التي تكتبها قبل تسجيلها. المتوسط مرجّح بالكمية."],
+      topSell: ["متوسط سعر البيع المثالي", "متوسط السعر الذي لا يجب أن تبيع تحته ليتحقق الربح المطلوب على مشترياتك المحتسبة."],
+      sq: ["الكمية المباعة", "كمية USDT الصافية التي تبيعها. يظهر تلقائيًا ما تبقى من مشترياتك، ويمكنك الكتابة فوقه."],
+      sp: ["سعر البيع", "سعر بيع الوحدة. يظهر تلقائيًا متوسط سعر البيع المثالي، ويمكنك تغييره. منه يُحسب مبلغ البيع والربح."],
+      ts: ["سعر البيع (للتحليل)", "أفضل سعر بيع معلن في P2P مثلًا. منه يُحسب أعلى سعر شراء يحقق ربحك."],
+      ta: ["مبلغ الشراء (اختياري)", "اكتب مبلغك لتعرف السعر المستهدف الخاص به. اتركه فارغًا لرؤية الجدول كاملًا."],
+      fb: ["رسوم الشراء", "النسبة التي تخصمها بينانس من الكمية عند الشراء (0.2% عادةً)."],
+      fs: ["رسوم البيع", "النسبة التي تخصمها بينانس من الكمية عند البيع (0.2% عادةً). تُحسب مسبقًا ضمن التكلفة الفعلية."],
+      bm: ["{Fee}", "عند التفعيل يُضاف {fee} إلى التكلفة. أوقفه إن لم يكن يُخصم منك."],
+      bk: ["{Fee}", "مبلغ ثابت ({u}) يُضاف إلى كل عملية شراء. اتركه 0 إن لم توجد رسوم."],
+      lang: ["اللغة", "لغة واجهة البرنامج."],
+      cur: ["العملة", "الرمز المعروض للمبالغ. لا يحوّل القيم."],
+      remain: ["الكمية المتبقية", "ما بقي لديك غير مباع من مشترياتك المحتسبة، بالـ USDT."],
+      profit: ["الربح", "مجموع أرباح عمليات البيع المسجلة، محسوبًا على متوسط تكلفة الشراء وقت كل بيع."],
+      settings: ["الإعدادات", "الرسوم واللغة والعملة."],
+      tabBuy: ["الشراء", "أدخل مبلغ الشراء والسعر المعلن لتعرف تكلفة الوحدة الفعلية، ثم سجّل العملية في السجل."],
+      tabSell: ["البيع", "سجّل بيع كمية بسعر معيّن لتعرف مبلغ البيع والربح. الكمية والسعر يُقترحان تلقائيًا."],
+      tabTarget: ["سعر الشراء المستهدف", "أداة تحليل: تعطيك أعلى سعر شراء تقبل به لتحقق ربحك عند سعر بيع معيّن، حسب مبلغ الشراء. الربح من الخانة العلوية والرسوم من الإعدادات. للأمان اعتمد عمود «أدنى المبلغ»، والأسعار مقرّبة للأسفل لضمان الربح."]
+    },
+    fr: {
+      bkf: ["{Fee}", "Frais de virement pour cette opération ({u}). Le montant des paramètres s'affiche automatiquement ; vous pouvez saisir une autre valeur. Il entre dans le calcul du coût réel."],
+      netq: ["Quantité nette achetée", "La quantité achetée (montant ÷ prix) après déduction des frais d'achat et de vente. Le coût réel et le profit se calculent sur cette quantité."],
+      a: ["Montant d'achat", "Le montant ({u}) que vous envoyez pour acheter des USDT. Les {fee} s'y ajoutent pour calculer le coût réel."],
+      p: ["Prix annoncé", "Prix unitaire ({u} pour 1 USDT) dans l'annonce du vendeur P2P. La quantité s'en déduit : montant ÷ prix."],
+      g: ["Profit visé", "Le profit que vous voulez par USDT ({u}). Il s'ajoute au coût réel pour donner le prix de vente idéal."],
+      curReal: ["Coût réel d'achat par unité", "Ce que coûte vraiment une unité après les frais d'achat, de vente et les {fee} : (montant + frais) ÷ quantité nette. C'est le prix de vente minimum sans profit."],
+      topReal: ["Coût réel moyen", "Coût moyen par unité sur tous les achats inclus, avec l'opération que vous saisissez avant de l'enregistrer. Moyenne pondérée par la quantité."],
+      topSell: ["Prix de vente idéal moyen", "Le prix moyen sous lequel il ne faut pas vendre pour obtenir le profit visé sur vos achats inclus."],
+      sq: ["Quantité vendue", "Quantité nette d'USDT que vous vendez. Le reste de vos achats s'affiche automatiquement ; vous pouvez le modifier."],
+      sp: ["Prix de vente", "Prix de vente unitaire. Le prix de vente idéal moyen s'affiche automatiquement ; vous pouvez le modifier. Il sert à calculer le montant et le profit."],
+      ts: ["Prix de vente (analyse)", "Par exemple la meilleure annonce de vente P2P. On en déduit le prix d'achat maximal qui garantit votre profit."],
+      ta: ["Montant d'achat (facultatif)", "Saisissez votre montant pour obtenir son prix cible. Laissez vide pour voir tout le tableau."],
+      fb: ["Frais d'achat", "Pourcentage prélevé par Binance sur la quantité à l'achat (0,2 % en général)."],
+      fs: ["Frais de vente", "Pourcentage prélevé par Binance sur la quantité à la vente (0,2 % en général). Déjà intégré au coût réel."],
+      bm: ["{Fee}", "Activé, les {fee} s'ajoutent au coût. Désactivez-le s'ils ne vous sont pas facturés."],
+      bk: ["{Fee}", "Montant fixe ({u}) ajouté à chaque achat. Laissez 0 s'il n'y a pas de frais."],
+      lang: ["Langue", "Langue de l'interface."],
+      cur: ["Devise", "Symbole affiché pour les montants. Les valeurs ne sont pas converties."],
+      remain: ["Quantité restante", "Ce qu'il vous reste à vendre de vos achats inclus, en USDT."],
+      profit: ["Profit", "Total des profits des ventes enregistrées, calculé sur le coût moyen d'achat au moment de chaque vente."],
+      settings: ["Paramètres", "Frais, langue et devise."],
+      tabBuy: ["Achat", "Saisissez le montant d'achat et le prix annoncé pour connaître le coût réel par unité, puis enregistrez l'opération dans le journal."],
+      tabSell: ["Vente", "Enregistrez la vente d'une quantité à un prix donné pour connaître le montant et le profit. Quantité et prix sont proposés automatiquement."],
+      tabTarget: ["Prix d'achat cible", "Outil d'analyse : donne le prix d'achat maximal à accepter pour réaliser votre profit à un prix de vente donné, selon le montant d'achat. Le profit vient du champ en haut, les frais des paramètres. Par sécurité, utilisez la colonne « Au montant min. » ; les prix sont arrondis à la baisse pour garantir le profit."]
+    },
+    en: {
+      bkf: ["{Fee}", "Transfer fee for this operation ({u}). The amount from Settings appears automatically; you can type another value. It is part of the real cost."],
+      netq: ["Net quantity bought", "The quantity bought (amount ÷ price) after buy and sell fees. The real cost and profit are based on this quantity."],
+      a: ["Purchase amount", "The amount ({u}) you send to buy USDT. The {fee} is added to it to work out the real cost."],
+      p: ["Listed price", "Unit price ({u} per 1 USDT) in the seller's P2P listing. The quantity is worked out as amount ÷ price."],
+      g: ["Target profit", "The profit you want per 1 USDT ({u}). It is added to the real cost to give the ideal sell price."],
+      curReal: ["Real purchase cost per unit", "What one unit really costs after buy and sell fees and the {fee}: (amount + fee) ÷ net quantity. It is the minimum sell price with no profit."],
+      topReal: ["Average real cost", "Average cost per unit across all included purchases, plus the operation you are typing before recording it. Weighted by quantity."],
+      topSell: ["Average ideal sell price", "The average price you should not sell below to reach your target profit on the included purchases."],
+      sq: ["Quantity sold", "Net USDT quantity you are selling. What is left of your purchases appears automatically; you can type over it."],
+      sp: ["Sell price", "Unit sell price. The average ideal sell price appears automatically; you can change it. It is used to work out the sale amount and profit."],
+      ts: ["Sell price (analysis)", "For example the best P2P sell listing. The highest buy price that secures your profit is worked out from it."],
+      ta: ["Purchase amount (optional)", "Type your amount to get its target price. Leave empty to see the whole table."],
+      fb: ["Buy fee", "Percentage Binance takes from the quantity when buying (usually 0.2%)."],
+      fs: ["Sell fee", "Percentage Binance takes from the quantity when selling (usually 0.2%). Already included in the real cost."],
+      bm: ["{Fee}", "When on, the {fee} is added to the cost. Turn it off if you are not charged."],
+      bk: ["{Fee}", "A fixed amount ({u}) added to every purchase. Leave it at 0 if there is no fee."],
+      lang: ["Language", "Interface language."],
+      cur: ["Currency", "Symbol shown for amounts. Values are not converted."],
+      remain: ["Remaining quantity", "What is left to sell from your included purchases, in USDT."],
+      profit: ["Profit", "Total profit of recorded sales, based on the average purchase cost at the time of each sale."],
+      settings: ["Settings", "Fees, language and currency."],
+      tabBuy: ["Buy", "Enter the purchase amount and listed price to see the real cost per unit, then record the operation in the log."],
+      tabSell: ["Sell", "Record the sale of a quantity at a price to see the sale amount and profit. Quantity and price are suggested automatically."],
+      tabTarget: ["Target buy price", "Analysis tool: gives the highest buy price you can accept to reach your profit at a given sell price, based on the purchase amount. The profit comes from the top field, fees from Settings. To be safe, use the “At lowest amount” column; prices are rounded down to guarantee the profit."]
+    }
+  };
+
+  function unit() { return curr === "EUR" ? "€" : curr === "USD" ? "$" : (lang === "ar" ? "دج" : "DA"); }
+  function feeName() { var k = curr === "DZD" ? "fee_dz" : "fee_ot"; return (T[lang] && T[lang][k]) || T.ar[k]; }
+  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+  function fill(s) { return s.replace(/\{Fee\}/g, cap(feeName())).replace(/\{fee\}/g, feeName()).replace(/\{u\}/g, unit()); }
+  function t(key) {
+    var s = (T[lang] && T[lang][key]) || T.ar[key] || key, a = arguments;
+    s = s.replace(/\{(\d+)\}/g, function (m, i) { return a[+i + 1]; });
+    return fill(s);
+  }
+  function feeHead() { return curr === "DZD" ? t("th_baridi") : cap(feeName()); }
+
+  /* ---------- أدوات ---------- */
+  function num(id) {
+    var v = $(id).value.replace(/[٠-٩]/g, function (d) { return "٠١٢٣٤٥٦٧٨٩".indexOf(d); })
+      .replace(/[٬\s]/g, "").replace("٫", ".").replace(",", ".");
+    var n = parseFloat(v); return isFinite(n) ? n : NaN;
+  }
+  function baridi(a) { return a <= 10000 ? 12 : a <= 20000 ? 15 : a <= 30000 ? 18 : a <= 40000 ? 21 : 24; }
+  function bf(fee) { return baridiOn ? fee : 0; }
+  // رسم التحويل: بريدي موب (حسب المجال) بالدينار، أو مبلغ ثابت لباقي العملات
+  function settingsFee() { var v = num("bk"); return (isNaN(v) || v < 0) ? 0 : v; }
+  function txFee(A) {
+    if (!baridiOn) return 0;
+    if (curr === "DZD") return baridi(A);
+    return settingsFee();
+  }
+  // رسم العملية في صفحة الشراء: بريدي موب تلقائي بالدينار، وخانة قابلة للتعديل بالعملات الأخرى
+  function buyFee(A) {
+    if (!baridiOn) return 0;
+    if (curr === "DZD") return baridi(A);
+    if (bfManual) { var v = num("bkf"); if (!isNaN(v) && v >= 0) return v; }
+    return settingsFee();
+  }
+  function syncBuyFee() {
+    var el = $("bkf"), dz = curr === "DZD";
+    $("bkfBox").hidden = dz;
+    el.disabled = !baridiOn;
+    el.classList.toggle("manual", bfManual && baridiOn);
+    if (dz || bfManual || document.activeElement === el) return;
+    el.value = (baridiOn ? settingsFee() : 0).toFixed(2).replace(".", ",");
+  }
+  function fmt(n, d) { return n.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d }); }
+  function sgn(n, d) { return (n >= 0 ? "+" : "") + fmt(n, d); }
+  function row(k, v, cls) { return '<div class="row"><dt>' + k + '</dt><dd' + (cls ? ' class="' + cls + '"' : "") + '>' + v + '</dd></div>'; }
+  function setVal(id, text) {
+    var el = $(id);
+    if (el.textContent === text) return;
+    el.textContent = text;
+    el.classList.remove("bump"); void el.offsetWidth; el.classList.add("bump");
+  }
+  function animateIn(el) { el.classList.remove("page-in"); void el.offsetWidth; el.classList.add("page-in"); }
+  var toastTimer = null;
+  function toast(msg) {
+    var tt = $("toast");
+    tt.textContent = msg; tt.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { tt.classList.remove("show"); }, 1700);
+    try { if (navigator.vibrate) navigator.vibrate(15); } catch (e) {}
+  }
+  var lastAdded = null;
+  function nowTime() { var d = new Date(); return ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2); }
+
+  /* ---------- إحصاءات مشتركة ---------- */
+  function purchaseStats(withPending) {
+    var inc = ops.filter(function (o) { return o.type === "buy" && o.inc; });
+    var cost = 0, q2 = 0, sellW = 0, n = inc.length;
+    inc.forEach(function (o) { cost += o.A + o.F; q2 += o.Q2; sellW += o.minSell * o.Q2; });
+    if (withPending && last) { cost += last.A + last.F; q2 += last.Q2; sellW += last.minSell * last.Q2; n++; }
+    if (!n) return null;
+    return { n: n, cost: cost, q2: q2, avgReal: cost / q2, avgSell: sellW / q2 };
+  }
+  function updateTop() {
+    var st = purchaseStats(true);
+    setVal("topReal", st ? fmt(st.avgReal, 2) : "—");
+    setVal("topSell", st ? fmt(st.avgSell, 2) : "—");
+  }
+  function soldTotal() {
+    return ops.reduce(function (s, o) { return o.type === "sell" ? s + o.q : s; }, 0);
+  }
+
+  /* ---------- صفحة الشراء ---------- */
+  function calc() {
+    var A = num("a"), P = num("p"), g = num("g"), fb = num("fb"), fs = num("fs");
+    if (isNaN(A) || isNaN(P) || A <= 0 || P <= 0) {
+      last = null;
+      setVal("curReal", "—");
+      setVal("netQ", "—");
+      updateTop();
+      $("save").disabled = true;
+      return;
+    }
+    if (isNaN(g)) g = 0; if (isNaN(fb)) fb = 0; if (isNaN(fs)) fs = 0;
+    fb /= 100; fs /= 100;
+    var F = buyFee(A);
+    var Q = A / P;
+    var Q1 = Q * (1 - fb);
+    var Q2 = Q1 - Q * fs;
+    var real = (A + F) / Q2;
+    var minSell = real + g;
+    last = { A: A, P: P, g: g, Q: Q, Q1: Q1, Q2: Q2, F: F, real: real, minSell: minSell };
+    setVal("curReal", fmt(real, 2));
+    setVal("netQ", fmt(Q2, 4));
+    updateTop();
+    $("save").disabled = false;
+  }
+  ["a", "p", "fb", "fs", "g", "bk", "bkf"].forEach(function (id) {
+    $(id).addEventListener("input", calc);
+  });
+  $("bkf").addEventListener("input", function () { bfManual = this.value.trim() !== ""; syncBuyFee(); calc(); });
+  $("bkf").addEventListener("blur", function () { syncBuyFee(); calc(); });
+  $("bk").addEventListener("input", function () { syncBuyFee(); calc(); });
+
+  $("save").addEventListener("click", function () {
+    if (!last) return;
+    var o = { type: "buy", n: ++counter, t: nowTime(), inc: true };
+    for (var k in last) o[k] = last[k];
+    ops.push(o);
+    lastAdded = o.n;
+    toast(t("toast_buy"));
+    $("a").value = ""; $("p").value = "";
+    bfManual = false; syncBuyFee();
+    calc();
+    renderLog();
+  });
+
+  /* ---------- صفحة البيع ---------- */
+  function setSellField(key, val, digits) {
+    var el = $(key);
+    el.classList.toggle("manual", sManual[key]);
+    if (sManual[key] || document.activeElement === el) return;
+    el.value = val === null ? "" : val.toFixed(digits).replace(".", ",");
+  }
+  function refreshSell() {
+    var st = purchaseStats();
+    var remain = st ? Math.max(st.q2 - soldTotal(), 0) : null;
+    setSellField("sq", remain, 4);
+    setSellField("sp", st ? st.avgSell : null, 2);
+
+    var q = num("sq"), p = num("sp"), out = $("sout");
+    if (isNaN(q) || isNaN(p) || q <= 0 || p <= 0) { out.innerHTML = ""; $("ssave").disabled = true; return; }
+    var rev = q * p, u = unit();
+    var html = '<div class="panel"><dl>' + row(t("sell_amount"), fmt(rev, 0) + " " + u);
+    if (st) {
+      var cost = q * st.avgReal, profit = rev - cost, perUnit = p - st.avgReal;
+      html += row(t("sell_cost", fmt(st.avgReal, 2)), fmt(cost, 0) + " " + u) +
+        row(t("sell_profit"), sgn(profit, 0) + " " + u + " (" + sgn(perUnit, 2) + " /USDT)", profit >= 0 ? "gain" : "loss");
+    }
+    out.innerHTML = html + "</dl></div>";
+    $("ssave").disabled = false;
+  }
+  ["sq", "sp"].forEach(function (k) {
+    var el = $(k);
+    el.addEventListener("input", function () { sManual[k] = el.value.trim() !== ""; refreshSell(); });
+    el.addEventListener("blur", refreshSell);
+  });
+  $("ssave").addEventListener("click", function () {
+    var q = num("sq"), p = num("sp");
+    if (isNaN(q) || isNaN(p) || q <= 0 || p <= 0) return;
+    var st = purchaseStats();
+    var cost = st ? q * st.avgReal : null;
+    ops.push({ type: "sell", n: ++counter, t: nowTime(), q: q, p: p, rev: q * p,
+      avgReal: st ? st.avgReal : null, cost: cost, profit: cost === null ? null : q * p - cost });
+    lastAdded = counter;
+    toast(t("toast_sell"));
+    sManual.sq = sManual.sp = false;
+    $("sq").value = ""; $("sp").value = "";
+    renderLog();
+  });
+
+  /* ---------- السجل المشترك ---------- */
+  function headCells() { return ["#", t("c_type"), t("c_time"), t("c_amount"), t("c_price"), t("c_net"), t("c_profit")]; }
+  function cells(o) {
+    if (o.type === "buy")
+      return [o.n, t("buy"), o.t, fmt(o.A, 0), fmt(o.real, 2), fmt(o.Q2, 4), "-"];
+    return [o.n, t("sell"), o.t, fmt(o.rev, 0), fmt(o.p, 2), fmt(o.q, 4),
+      o.profit === null ? "-" : sgn(o.profit, 0)];
+  }
+  function copyHead() {
+    return ["#", t("c_type"), t("c_time"), t("c_amount"), t("c_listed"), t("c_bought"), t("c_afterbuy"), t("c_net"), feeHead(), t("c_price"), t("c_profit")];
+  }
+  function copyCells(o) {
+    if (o.type === "buy")
+      return [o.n, t("buy"), o.t, fmt(o.A, 0), fmt(o.P, 2), fmt(o.Q, 4), fmt(o.Q1, 4), fmt(o.Q2, 4), fmt(o.F, 2), fmt(o.real, 2), "-"];
+    return [o.n, t("sell"), o.t, fmt(o.rev, 0), fmt(o.p, 2), "-", "-", fmt(o.q, 4), "-",
+      fmt(o.p, 2), o.profit === null ? "-" : fmt(o.profit, 0)];
+  }
+
+  function renderSummary() {
+    var box = $("sum");
+    var st = purchaseStats(), sold = soldTotal();
+    updateTop();
+    var profit = 0, hasP = false;
+    ops.forEach(function (o) { if (o.type === "sell" && o.profit !== null) { profit += o.profit; hasP = true; } });
+    if (!st && !hasP) { box.innerHTML = ""; return; }
+    function cell(cls, name, val, unitTxt, key) {
+      return '<div class="cell ' + cls + '"><div class="name"><button type="button" class="info" data-tip="' + key + '" aria-label="' + t("explain") + '">!</button>' + name + '</div><div class="val">' + val +
+        (unitTxt ? ' <span class="unit">' + unitTxt + '</span>' : "") + "</div></div>";
+    }
+    box.innerHTML = '<div class="cells">' +
+      cell("c3", t("remain"), st ? fmt(Math.max(st.q2 - sold, 0), 2) : "—", "USDT", "remain") +
+      cell(hasP ? (profit >= 0 ? "c4" : "c5") : "c3", t("profit"), hasP ? sgn(profit, 2) : "—", unit(), "profit") +
+      "</div>";
+  }
+
+  var STORE_KEY = "p2p-usdt-v1";
+  function persist() {
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify({ ops: ops, counter: counter, g: $("g").value, fb: $("fb").value, fs: $("fs").value,
+        bk: $("bk").value, bm: baridiOn, lang: lang, cur: curr }));
+    } catch (e) {}
+  }
+  function restore() {
+    try {
+      var d = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
+      if (!d) return;
+      ops = d.ops || []; counter = d.counter || 0;
+      if (d.g) $("g").value = d.g;
+      if (d.fb) $("fb").value = d.fb;
+      if (d.fs) $("fs").value = d.fs;
+      if (d.bk) $("bk").value = d.bk;
+      baridiOn = d.bm !== false;
+      if (d.lang && T[d.lang]) lang = d.lang;
+      if (d.cur) curr = d.cur;
+    } catch (e) {}
+  }
+
+  function renderLog() {
+    persist();
+    $("copy").hidden = $("clear").hidden = ops.length === 0;
+    renderSummary();
+    refreshSell();
+    var box = $("log");
+    if (!ops.length) { box.innerHTML = '<p class="empty">' + t("empty_log") + '</p>'; return; }
+    var h = '<div class="scroll"><table><thead><tr><th>' + t("th_inc") + '</th>';
+    headCells().forEach(function (x) { h += "<th>" + x + "</th>"; });
+    h += "<th></th></tr></thead><tbody>";
+    ops.forEach(function (o, i) {
+      var c = cells(o), isBuy = o.type === "buy";
+      var trc = (isBuy && !o.inc ? "off " : "") + (o.n === lastAdded ? "new" : "");
+      h += "<tr" + (trc ? ' class="' + trc.trim() + '"' : "") + "><td>" +
+        (isBuy ? '<input type="checkbox" class="inc" data-i="' + i + '"' + (o.inc ? " checked" : "") + ' aria-label="' + t("inc_aria") + '">' : "") + "</td>";
+      c.forEach(function (v, j) {
+        if (j === 1) h += '<td><span class="tag ' + (isBuy ? "buy" : "sell") + '">' + v + "</span></td>";
+        else {
+          var cls = "n";
+          if (j === 4 || j === 6) cls += " key";
+          if (j === 6 && !isBuy && o.profit !== null) cls += o.profit >= 0 ? " gain" : " loss";
+          h += '<td class="' + cls + '">' + v + "</td>";
+        }
+      });
+      h += '<td><button class="x" data-i="' + i + '" aria-label="' + t("del_row") + '">✕</button></td></tr>';
+    });
+    box.innerHTML = h + "</tbody></table></div>";
+    lastAdded = null;
+  }
+
+  $("log").addEventListener("change", function (e) {
+    var c = e.target.closest(".inc"); if (!c) return;
+    ops[parseInt(c.getAttribute("data-i"), 10)].inc = c.checked;
+    renderLog();
+  });
+  $("log").addEventListener("click", function (e) {
+    var b = e.target.closest(".x"); if (!b) return;
+    ops.splice(parseInt(b.getAttribute("data-i"), 10), 1);
+    renderLog();
+  });
+  $("clear").addEventListener("click", function () {
+    if (ops.length && confirm(t("confirm_clear"))) { ops = []; counter = 0; renderLog(); }
+  });
+  $("copy").addEventListener("click", function () {
+    var lines = [copyHead().join("\t")];
+    ops.forEach(function (o) { lines.push(copyCells(o).join("\t")); });
+    var text = lines.join("\n"), btn = $("copy");
+    copyText(text, function (ok) {
+      btn.textContent = ok ? t("copied") : t("copy_fail");
+      setTimeout(function () { btn.textContent = t("copy"); }, 1600);
+    });
+  });
+
+  /* ---------- نسخ القيم ---------- */
+  var COPY_ICON = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>';
+  var CHECK_ICON = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>';
+  function copyText(text, cb) {
+    function done(ok) { if (cb) cb(ok); }
+    function fallback() {
+      var ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select();
+      var ok = false; try { ok = document.execCommand("copy"); } catch (e2) {}
+      document.body.removeChild(ta); done(ok);
+    }
+    try { navigator.clipboard.writeText(text).then(function () { done(true); }, fallback); } catch (e) { fallback(); }
+  }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest(".copy-btn"); if (!b) return;
+    var v = b.getAttribute("data-v");
+    if (v === null) v = $(b.getAttribute("data-src")).textContent;
+    v = (v || "").replace(/,/g, "").trim();
+    if (!v || v === "—") return;
+    copyText(v, function (ok) {
+      if (!ok) { toast(t("copy_fail")); return; }
+      b.innerHTML = CHECK_ICON;
+      setTimeout(function () { b.innerHTML = COPY_ICON; }, 1200);
+      toast(t("copied"));
+    });
+  });
+
+  /* ---------- أزرار الزيادة والإنقاص ---------- */
+  var STEPS = { a: 0.01, p: 0.01, g: 0.01, fb: 0.1, fs: 0.1, sq: 0.01, sp: 0.01, ts: 0.01, ta: 0.01, bk: 0.01, bkf: 0.01 };
+  var DEC = { a: 2, p: 2, g: 2, fb: 1, fs: 1, sq: 2, sp: 2, ts: 2, ta: 2, bk: 2, bkf: 2 };
+  function stepField(id, dir) {
+    var el = $(id), cur = num(id);
+    if (isNaN(cur)) cur = 0;
+    var v = Math.max(0, Math.round((cur + dir * STEPS[id]) * 1e4) / 1e4);
+    el.value = v.toFixed(DEC[id]).replace(".", ",");
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+  Object.keys(STEPS).forEach(function (id) {
+    var el = $(id), wrap = document.createElement("div");
+    wrap.className = "stepper";
+    el.parentNode.insertBefore(wrap, el);
+    function mk(up) {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "stp"; b.textContent = up ? "▲" : "▼";
+      b.setAttribute("data-dir", up ? "up" : "down");
+      var dir = up ? 1 : -1, t1 = null, t2 = null;
+      function stop() { clearTimeout(t1); clearInterval(t2); }
+      b.addEventListener("pointerdown", function (e) {
+        e.preventDefault();
+        stepField(id, dir);
+        t1 = setTimeout(function () { t2 = setInterval(function () { stepField(id, dir); }, 90); }, 450);
+      });
+      ["pointerup", "pointerleave", "pointercancel"].forEach(function (ev) { b.addEventListener(ev, stop); });
+      b.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+      b.addEventListener("click", function (e) { if (e.detail === 0) stepField(id, dir); });
+      return b;
+    }
+    var col = document.createElement("div");
+    col.className = "stp-col";
+    col.appendChild(mk(true));
+    col.appendChild(mk(false));
+    wrap.appendChild(col);
+    wrap.appendChild(el);
+  });
+
+  /* ---------- سعر الشراء المستهدف ---------- */
+  var BR = [
+    { fee: 12, lo: 0,     hi: 10000,    low: 5000,  high: 10000 },
+    { fee: 15, lo: 10001, hi: 20000,    low: 10001, high: 20000 },
+    { fee: 18, lo: 20001, hi: 30000,    low: 20001, high: 30000 },
+    { fee: 21, lo: 30001, hi: 40000,    low: 30001, high: 40000 },
+    { fee: 24, lo: 40001, hi: Infinity, low: 40001, high: 100000 }
+  ];
+  var REF = [100, 500, 1000, 5000, 10000];
+  function rangeLabel(b) { return b.hi === Infinity ? fmt(b.lo, 0) + " " + t("and_above") : fmt(b.lo, 0) + " – " + fmt(b.hi, 0); }
+  function floor2(x) { return Math.floor(x * 100 + 1e-9) / 100; }
+  function targetPrice(S, g, A, F, k) { return floor2((S - g) * k / (1 + F / A)); }
+
+  function renderBmTable() {
+    var h = "";
+    BR.forEach(function (b) { h += "<tr><td>" + rangeLabel(b) + "</td><td>" + b.fee + " " + unit() + "</td></tr>"; });
+    $("bmBody").innerHTML = h;
+  }
+
+  function calcTarget() {
+    var S = num("ts"), A = num("ta"), g = num("g"), fb = num("fb"), fs = num("fs"), out = $("tout");
+    if (isNaN(S) || S <= 0) { out.innerHTML = ""; return; }
+    if (isNaN(g)) g = 0; if (isNaN(fb)) fb = 0; if (isNaN(fs)) fs = 0;
+    var k = 1 - fb / 100 - fs / 100;
+    var html = "", u = unit(), hasA = !isNaN(A) && A > 0;
+    if (curr === "DZD") {
+      var cur = -1;
+      if (hasA) {
+        for (var i = 0; i < BR.length; i++) { if (A <= BR[i].hi) { cur = i; break; } }
+        var tp = targetPrice(S, g, A, bf(BR[cur].fee), k);
+        html += '<div class="res b"><button type="button" class="copy-btn" data-v="' + tp.toFixed(2) + '" aria-label="' + t("copy_value") + '">' + COPY_ICON + '</button>' +
+          '<div class="name">' + t("t_buy_at", fmt(A, 0)) + '</div>' +
+          '<div class="big">' + fmt(tp, 2) + ' <span class="unit">' + u + '</span></div></div>';
+      }
+      html += '<div class="panel"><div class="scroll"><table><thead><tr><th>' + t("th_range") + '</th><th>' + t("th_fee_short") + '</th>' +
+        '<th>' + t("th_low") + '</th><th>' + t("th_high") + '</th></tr></thead><tbody>';
+      BR.forEach(function (b, i) {
+        html += '<tr' + (i === cur ? ' class="cur"' : "") + '><td>' + rangeLabel(b) + '</td><td class="n">' + bf(b.fee) + '</td>' +
+          '<td class="n key">' + fmt(targetPrice(S, g, b.low, bf(b.fee), k), 2) + '<span class="sub">' + fmt(b.low, 0) + '</span></td>' +
+          '<td class="n key">' + fmt(targetPrice(S, g, b.high, bf(b.fee), k), 2) + '<span class="sub">' + fmt(b.high, 0) + '</span></td></tr>';
+      });
+      html += '</tbody></table></div></div>';
+    } else {
+      var fx = txFee(1);
+      if (hasA) {
+        var tpx = targetPrice(S, g, A, fx, k);
+        html += '<div class="res b"><button type="button" class="copy-btn" data-v="' + tpx.toFixed(2) + '" aria-label="' + t("copy_value") + '">' + COPY_ICON + '</button>' +
+          '<div class="name">' + t("t_buy_at", fmt(A, 2)) + '</div>' +
+          '<div class="big">' + fmt(tpx, 2) + ' <span class="unit">' + u + '</span></div></div>';
+      }
+      html += '<div class="panel"><div class="scroll"><table><thead><tr><th>' + t("th_amount") + '</th><th>' + t("th_fee_short") + '</th>' +
+        '<th>' + t("th_target") + '</th></tr></thead><tbody>';
+      REF.forEach(function (r) {
+        html += '<tr><td class="n">' + fmt(r, 0) + '</td><td class="n">' + fmt(fx, 2) + '</td><td class="n key">' + fmt(targetPrice(S, g, r, fx, k), 2) + '</td></tr>';
+      });
+      html += '</tbody></table></div></div>';
+    }
+    out.innerHTML = html;
+  }
+  ["ts", "ta", "g", "fb", "fs", "bk"].forEach(function (id) { $(id).addEventListener("input", calcTarget); });
+  $("g").addEventListener("input", persist);
+
+  /* ---------- التبويبات ---------- */
+  var PAGES = { buy: ["pageBuy", "tabBuy"], sell: ["pageSell", "tabSell"], target: ["pageTarget", "tabTarget"] };
+  function showPage(name) {
+    var idx = 0;
+    Object.keys(PAGES).forEach(function (k, i) {
+      var on = k === name;
+      if (on) idx = i;
+      $(PAGES[k][0]).hidden = !on;
+      $(PAGES[k][1]).setAttribute("aria-selected", on);
+    });
+    $("tabs").style.setProperty("--idx", idx);
+    animateIn($(PAGES[name][0]));
+    if (name === "sell") refreshSell();
+    if (name === "target") calcTarget();
+  }
+  $("tabBuy").addEventListener("click", function () { showPage("buy"); });
+  $("tabSell").addEventListener("click", function () { showPage("sell"); });
+  $("tabTarget").addEventListener("click", function () { showPage("target"); });
+
+  /* ---------- أيقونات الشرح (!) ---------- */
+  function mkInfo(key) {
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "info"; b.setAttribute("data-tip", key);
+    b.setAttribute("aria-label", "شرح"); b.textContent = "!";
+    return b;
+  }
+  function addInfo(el, key, before) {
+    if (!el) return;
+    el.insertBefore(mkInfo(key), before || el.firstChild);
+  }
+  ["a", "p", "g", "sq", "sp", "ts", "ta", "fb", "fs", "bk", "bkf"].forEach(function (id) {
+    addInfo(document.querySelector('label[for="' + id + '"]'), id);
+  });
+  addInfo($("netqLabel"), "netq");
+  addInfo(document.querySelector(".tb.a .name"), "topReal");
+  addInfo(document.querySelector(".tb.b .name"), "topSell");
+  addInfo(document.querySelector(".res.a .name"), "curReal");
+  addInfo(document.querySelector("label.switch"), "bm", document.querySelector("label.switch .slider"));
+  (function () {
+    var btn = $("settingsBtn"), w = document.createElement("div");
+    w.className = "headact";
+    btn.parentNode.insertBefore(w, btn);
+    w.appendChild(mkInfo("settings"));
+    w.appendChild(btn);
+  })();
+  ["tabBuy", "tabSell", "tabTarget"].forEach(function (id) {
+    var b = $(id), w = document.createElement("div");
+    w.className = "tabcell";
+    b.parentNode.insertBefore(w, b);
+    w.appendChild(b);
+    w.appendChild(mkInfo(id));
+  });
+
+  var tipBtn = null;
+  function hideTip() {
+    $("tip").hidden = true;
+    if (tipBtn) { tipBtn.setAttribute("aria-expanded", "false"); tipBtn = null; }
+  }
+  function showTip(btn) {
+    var d = (TIPS[lang] || TIPS.ar)[btn.getAttribute("data-tip")]; if (!d) return;
+    var tip = $("tip");
+    tip.querySelector(".tt").textContent = fill(d[0]);
+    tip.querySelector(".td").textContent = fill(d[1]);
+    tip.hidden = false;
+    var r = btn.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
+    var left = Math.min(Math.max(12, r.left + r.width / 2 - w / 2), window.innerWidth - w - 12);
+    var top = r.bottom + 10;
+    if (top + h > window.innerHeight - 10) top = Math.max(10, r.top - h - 10);
+    tip.style.left = left + "px"; tip.style.top = top + "px";
+    tipBtn = btn; btn.setAttribute("aria-expanded", "true");
+  }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest(".info");
+    if (b) {
+      e.preventDefault();           // لا تفعّل الخانة أو المفتاح المرتبط بالعنوان
+      if (tipBtn === b) hideTip(); else { hideTip(); showTip(b); }
+      return;
+    }
+    if (!e.target.closest("#tip")) hideTip();
+  });
+  window.addEventListener("scroll", hideTip, { passive: true });
+  window.addEventListener("resize", hideTip);
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Escape") return;
+    hideTip();
+    if (!$("settingsPage").hidden) cancelSettings(); else closeMenu();
+  });
+
+  /* ---------- الإعدادات ---------- */
+  function segUI(id, val) {
+    Array.prototype.forEach.call($(id).querySelectorAll("button"), function (b) {
+      b.setAttribute("aria-pressed", b.getAttribute("data-v") === val);
+    });
+  }
+  /* --- القائمة المنسدلة --- */
+  function closeMenu() {
+    $("settingsMenu").hidden = true;
+    $("settingsBtn").setAttribute("aria-expanded", "false");
+  }
+  $("settingsBtn").addEventListener("click", function () {
+    var m = $("settingsMenu"), open = m.hidden;
+    hideTip();
+    m.hidden = !open;
+    this.setAttribute("aria-expanded", open);
+    if (open) animateIn(m);
+  });
+  document.addEventListener("click", function (e) {
+    if (!$("settingsMenu").hidden && !e.target.closest("#settingsMenu") && !e.target.closest("#settingsBtn")) closeMenu();
+  });
+  $("settingsMenu").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-sec]"); if (b) openSettings(b.getAttribute("data-sec"));
+  });
+
+  /* --- صفحة التعديل (مسودة: لا يُثبَّت شيء إلا بزر «حفظ») --- */
+  var SEC = { fees: ["secFees", "menu_fees"], cur: ["secCur", "menu_cur"], lang: ["secLang", "menu_lang"] };
+  var snap = null, curSec = null, draftCur = "DZD", draftLang = "ar";
+  function setTitle(sec) {
+    var el = $("setTitle");
+    el.textContent = t(SEC[sec][1]);
+    if (sec === "cur" || sec === "lang") {
+      var i = mkInfo(sec); i.setAttribute("aria-label", t("explain"));
+      el.insertBefore(i, el.firstChild);
+    }
+  }
+  function openSettings(sec) {
+    closeMenu(); hideTip();
+    curSec = sec;
+    snap = { fb: $("fb").value, fs: $("fs").value, bk: $("bk").value, bm: baridiOn };
+    draftCur = curr; draftLang = lang;
+    segUI("curSeg", draftCur); segUI("langSeg", draftLang);
+    Object.keys(SEC).forEach(function (k) { $(SEC[k][0]).hidden = k !== sec; });
+    setTitle(sec);
+    $("settingsPage").hidden = false;
+    $("setBody").scrollTop = 0;
+    document.body.style.overflow = "hidden";
+  }
+  function closeSettings() {
+    $("settingsPage").hidden = true;
+    document.body.style.overflow = "";
+    curSec = null; snap = null; hideTip();
+  }
+  function cancelSettings() {
+    if (snap) {
+      $("fb").value = snap.fb; $("fs").value = snap.fs; $("bk").value = snap.bk; baridiOn = snap.bm;
+      syncFeeUI(); calc(); calcTarget();
+    }
+    closeSettings();
+  }
+  function saveSettings() {
+    var changed = draftCur !== curr || draftLang !== lang;
+    curr = draftCur; lang = draftLang;
+    persist();
+    closeSettings();
+    if (changed) applyI18n(); else { calc(); calcTarget(); }
+    toast(t("toast_saved"));
+  }
+  function resetSettings() {
+    if (curSec === "fees") {
+      $("fb").value = "0,2"; $("fs").value = "0,2"; $("bk").value = "0,00"; baridiOn = true;
+      syncFeeUI(); calc(); calcTarget();
+    } else if (curSec === "cur") { draftCur = "DZD"; segUI("curSeg", draftCur); }
+    else if (curSec === "lang") { draftLang = "ar"; segUI("langSeg", draftLang); }
+  }
+  $("setBack").addEventListener("click", cancelSettings);
+  $("setSave").addEventListener("click", saveSettings);
+  $("setReset").addEventListener("click", resetSettings);
+  $("bm").addEventListener("change", function () {
+    baridiOn = this.checked;
+    syncFeeUI();
+    calc(); calcTarget();
+  });
+  $("curSeg").addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return;
+    draftCur = b.getAttribute("data-v"); segUI("curSeg", draftCur);
+  });
+  $("langSeg").addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return;
+    draftLang = b.getAttribute("data-v"); segUI("langSeg", draftLang);
+  });
+  function syncFeeUI() {
+    var dz = curr === "DZD";
+    $("bm").checked = baridiOn;
+    $("bmTable").hidden = !dz;
+    $("bmTable").classList.toggle("off", !baridiOn);
+    $("bkRow").hidden = dz;
+    $("bk").disabled = !baridiOn;
+    syncBuyFee();
+  }
+
+  /* ---------- تطبيق اللغة والعملة ---------- */
+  function applyI18n() {
+    hideTip();
+    var h = document.documentElement;
+    h.lang = lang; h.dir = lang === "ar" ? "rtl" : "ltr";
+    document.title = t("title");
+    Array.prototype.forEach.call(document.querySelectorAll("[data-i18n]"), function (el) {
+      el.textContent = t(el.getAttribute("data-i18n"));
+    });
+    Array.prototype.forEach.call(document.querySelectorAll("[data-unit]"), function (el) { el.textContent = unit(); });
+    $("settingsBtn").setAttribute("aria-label", t("settings")); $("settingsBtn").title = t("settings");
+    $("tabs").setAttribute("aria-label", t("pages"));
+    $("langSeg").setAttribute("aria-label", t("sec_lang"));
+    $("curSeg").setAttribute("aria-label", t("sec_cur"));
+    $("logs").setAttribute("aria-label", t("log_title"));
+    Array.prototype.forEach.call(document.querySelectorAll(".info"), function (b) { b.setAttribute("aria-label", t("explain")); });
+    Array.prototype.forEach.call(document.querySelectorAll(".stp"), function (b) {
+      b.setAttribute("aria-label", t(b.getAttribute("data-dir") === "up" ? "up" : "down"));
+    });
+    Array.prototype.forEach.call(document.querySelectorAll(".copy-btn"), function (b) { b.setAttribute("aria-label", t("copy_value")); });
+    $("menuCur").textContent = curr === "EUR" ? "€" : curr === "USD" ? "$" : "DZD";
+    $("menuLang").textContent = { ar: "عربي", fr: "Français", en: "English" }[lang];
+    $("setBack").setAttribute("aria-label", t("back"));
+    segUI("langSeg", lang); segUI("curSeg", curr);
+    syncFeeUI();
+    renderBmTable();
+    calc(); calcTarget(); renderLog();
+  }
+
+  restore();
+  applyI18n();
+})();
+</script>
+<script>
+if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {
+  window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });
+}
+</script>
+</body>
+</html>
