@@ -1,0 +1,1642 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1f4fd8">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="P2P USDT">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>حاسبة P2P USDT</title>
+<style>
+  :root {
+    --paper:#eef2f7; --card:#fff; --ink:#13233f; --muted:#5d6b82; --line:#d3dbe7;
+    --accent:#1f4fd8; --accent-ink:#fff; --result:#fff4cc; --result-ink:#3d2d00;
+    --second:#e3ecff; --second-ink:#10265c; --manual:#fff0d6; --danger:#b3261e;
+    --lossbg:#fde4e1; --gain:#13795b; --tagbuy:#dfe8ff; --tagbuy-ink:#17389a; --tagsell:#d9f3e8; --tagsell-ink:#0d5a43;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper:#0e1626; --card:#16213a; --ink:#e8eefb; --muted:#9aa9c4; --line:#2b3a5c;
+      --accent:#7da2ff; --accent-ink:#0e1626; --result:#3a2f0a; --result-ink:#ffe9a3;
+      --second:#1d2c52; --second-ink:#d6e3ff; --manual:#3a2f0a; --danger:#ff8a80;
+      --lossbg:#3b1714; --gain:#4fd1a1; --tagbuy:#1d2c52; --tagbuy-ink:#bcd0ff; --tagsell:#12382d; --tagsell-ink:#9ff0cf; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--paper); color:var(--ink);
+    font-family:"Noto Sans Arabic","Segoe UI",Tahoma,system-ui,sans-serif; line-height:1.6; -webkit-text-size-adjust:100%; }
+  main { max-width:620px; margin:0 auto; padding:16px 14px calc(96px + env(safe-area-inset-bottom)); }
+  .head { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+  h1 { font-size:1.25rem; margin:6px 0 4px; }
+  h2 { font-size:1rem; margin:0 0 8px; }
+  .info { display:inline-flex; align-items:center; justify-content:center; vertical-align:middle;
+    width:13px; height:13px; padding:0; margin-inline-start:5px; border:1.3px solid currentColor; border-radius:50%;
+    background:transparent; color:inherit; opacity:.7; font-size:.55rem; font-weight:800; line-height:1; position:relative; }
+  .info::after { content:""; position:absolute; inset:-8px; }
+  .info:hover, .info[aria-expanded="true"] { opacity:1; }
+  #settingsBtn { font-size:1.2rem; line-height:1; padding:7px 12px; }
+  #settingsBtn[aria-expanded="true"] { background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
+  .headact { display:flex; align-items:center; gap:6px; }
+  .tip { position:fixed; z-index:60; max-width:min(300px, calc(100vw - 24px)); background:var(--ink); color:var(--paper);
+    border-radius:12px; padding:12px 14px; box-shadow:0 8px 26px rgba(0,0,0,.3); animation:tipIn .16s ease-out; }
+  .tip .tt { font-weight:800; font-size:.92rem; margin-bottom:4px; }
+  .tip .td { font-size:.86rem; line-height:1.6; opacity:.95; }
+  @keyframes tipIn { from { opacity:0; transform:scale(.96); } to { opacity:1; transform:none; } }
+  .sh { font-size:.95rem; margin:18px 0 8px; padding-top:14px; border-top:1px solid var(--line); }
+  .sh:first-child { margin-top:0; padding-top:0; border-top:0; }
+  .switch { display:flex; align-items:center; gap:12px; margin:16px 0 8px; cursor:pointer; font-size:.95rem; }
+  .switch input { position:absolute; opacity:0; width:1px; height:1px; }
+  .slider { direction:ltr; position:relative; flex:0 0 46px; width:46px; height:26px; border-radius:26px; background:var(--line); transition:background .2s; }
+  .slider::after { content:""; position:absolute; top:3px; left:3px; width:20px; height:20px; border-radius:50%; background:#fff;
+    box-shadow:0 1px 3px rgba(0,0,0,.3); transition:transform .2s; }
+  .switch input:checked ~ .slider { background:var(--accent); }
+  .switch input:checked ~ .slider::after { transform:translateX(20px); }
+  .switch input:focus-visible ~ .slider { outline:3px solid var(--accent); outline-offset:2px; }
+  #bmTable { transition:opacity .2s; }
+  #bmTable.off { opacity:.4; }
+  .seg { display:flex; gap:6px; }
+  .seg button { flex:1; border:1px solid var(--line); background:var(--paper); color:var(--ink); border-radius:10px; padding:9px 6px; font-weight:700; }
+  .seg button[aria-pressed="true"] { background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
+  [hidden] { display:none !important; }
+  button, input { touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
+  button { transition:transform .12s ease, background-color .15s, opacity .15s; }
+  .btn:active:not(:disabled), .btn2:active { transform:scale(.97); }
+  .stp:active { transform:scale(.92); }
+  input { transition:border-color .15s, background-color .2s, box-shadow .15s; }
+  input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(31,79,216,.18); }
+  .page-in { animation:pageIn .24s ease-out; }
+  @keyframes pageIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+  .bump { display:inline-block; animation:bump .32s ease-out; }
+  @keyframes bump { from { opacity:.35; transform:translateY(5px) scale(.97); } to { opacity:1; transform:none; } }
+  #topReal, #topSell, #curReal { display:inline-block; }
+  tr.new td { animation:rowFlash 1.1s ease-out; }
+  @keyframes rowFlash { from { background:var(--result); } to { background:transparent; } }
+  .toast { position:fixed; left:50%; bottom:calc(88px + env(safe-area-inset-bottom)); z-index:50; transform:translate(-50%, 16px); opacity:0; pointer-events:none;
+    background:var(--ink); color:var(--paper); padding:10px 18px; border-radius:24px; font-weight:700; font-size:.92rem;
+    box-shadow:0 6px 20px rgba(0,0,0,.25); transition:opacity .22s, transform .22s; }
+  .toast.show { opacity:1; transform:translate(-50%, 0); }
+  @media (prefers-reduced-motion: reduce) { * { animation:none !important; transition:none !important; } }
+  .topbar { position:sticky; top:0; z-index:10; display:grid; grid-template-columns:1.15fr 1fr 1fr; gap:6px;
+    background:var(--paper); padding:8px 0 10px; margin-bottom:2px; }
+  .tb { border-radius:12px; padding:8px 12px; }
+  .tb.a { background:var(--second); color:var(--second-ink); }
+  .tb.b { background:var(--result); color:var(--result-ink); }
+  .tb { padding:8px 9px; min-width:0; }
+  .tb.g { background:var(--card); border:1px solid var(--accent); color:var(--ink); }
+  .tb.g label { margin:4px 0 0; color:var(--muted); }
+  .tb.g input { font-size:1.15rem; font-weight:700; padding:6px 6px; border-radius:8px; }
+  .tb.g .stp-col { flex-basis:30px; }
+  .tb.g .stepper { gap:4px; }
+  .tb .name { font-size:.72rem; opacity:.9; line-height:1.3; }
+  .tb .val { font-size:1.3rem; font-weight:800; line-height:1.25; direction:ltr; text-align:right; font-variant-numeric:tabular-nums; }
+  .tb .unit { font-size:.78rem; font-weight:600; }
+  .panel { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px; margin-top:12px; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .grid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  .wide { grid-column:1 / -1; }
+  label { display:block; font-size:.85rem; color:var(--muted); margin-bottom:4px; }
+  input[type=text], input:not([type]) { width:100%; font:inherit; font-size:1.05rem; color:var(--ink); background:var(--paper);
+    border:1px solid var(--line); border-radius:10px; padding:10px 12px; direction:ltr; text-align:right; }
+  .stepper { display:flex; direction:ltr; gap:6px; align-items:stretch; }
+  .stepper input { flex:1; min-width:0; text-align:right; }
+  .stp-col { flex:0 0 40px; display:flex; flex-direction:column; gap:3px; }
+  .stp { flex:1; min-height:20px; border:1px solid var(--line); background:var(--paper); color:var(--ink); border-radius:7px;
+    font-size:.72rem; line-height:1; padding:0; user-select:none; -webkit-user-select:none;
+    -webkit-touch-callout:none; touch-action:manipulation; }
+  .stp:active { background:var(--second); }
+  input.manual { background:var(--manual); border-color:var(--accent); }
+  .small label { font-size:.74rem; line-height:1.3; min-height:2.4em; }
+  .small input { font-size:.92rem; padding:7px 8px; }
+  .hint { font-size:.76rem; color:var(--muted); margin:8px 0 0; }
+  :focus-visible { outline:3px solid var(--accent); outline-offset:2px; }
+  .res { border-radius:14px; padding:16px; margin-top:12px; }
+  .res.a { background:var(--second); color:var(--second-ink); }
+  .res.b { background:var(--result); color:var(--result-ink); }
+  .res .name { font-size:.9rem; opacity:.9; }
+  .res .big { font-size:2.3rem; font-weight:800; line-height:1.2; direction:ltr; text-align:right; font-variant-numeric:tabular-nums; }
+  .res .unit { font-size:.9rem; font-weight:600; }
+  .res.mid { padding:12px 14px; margin-top:8px; }
+  .res.mid .big { font-size:1.7rem; }
+  dl { margin:0; }
+  .row { display:flex; justify-content:space-between; gap:12px; padding:7px 0; border-top:1px solid var(--line); font-size:.92rem; }
+  .row:first-child { border-top:0; }
+  .row dt { color:var(--muted); }
+  .row dd { margin:0; font-weight:600; direction:ltr; font-variant-numeric:tabular-nums; }
+  .gain { color:var(--gain); } .loss { color:var(--danger); }
+  button { font:inherit; cursor:pointer; }
+  .btn { background:var(--accent); color:var(--accent-ink); border:0; border-radius:10px; padding:11px 16px; font-weight:700; width:100%; margin-top:12px; }
+  .btn:disabled { opacity:.45; cursor:not-allowed; }
+  .btn2 { background:transparent; color:var(--ink); border:1px solid var(--line); border-radius:9px; padding:7px 12px; font-size:.85rem; }
+  .logbar { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+  .scroll { overflow-x:auto; margin-top:8px; -webkit-overflow-scrolling:touch; }
+  table { width:100%; border-collapse:collapse; font-size:.84rem; white-space:nowrap; }
+  th,td { padding:8px 8px; text-align:right; border-top:1px solid var(--line); }
+  th { font-size:.74rem; color:var(--muted); border-top:0; font-weight:600; }
+  td.n { direction:ltr; font-variant-numeric:tabular-nums; }
+  td.key { font-weight:700; }
+  td input[type=checkbox] { width:20px; height:20px; padding:0; accent-color:var(--accent); }
+  tr.off td { opacity:.45; }
+  .tag { display:inline-block; padding:1px 10px; border-radius:20px; font-weight:700; font-size:.78rem; }
+  .tag.buy { background:var(--tagbuy); color:var(--tagbuy-ink); }
+  .tag.sell { background:var(--tagsell); color:var(--tagsell-ink); }
+  .x { background:transparent; border:0; color:var(--danger); font-size:1.05rem; padding:2px 8px; }
+  .cells { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px; }
+  .cell { border-radius:12px; padding:8px 10px; min-width:0; }
+  .cell .name { font-size:.72rem; opacity:.9; line-height:1.3; }
+  .cell .val { font-size:1.15rem; font-weight:800; line-height:1.3; direction:ltr; text-align:right; font-variant-numeric:tabular-nums; }
+  .cell .unit { font-size:.7rem; font-weight:600; }
+  .cell.c1 { background:var(--second); color:var(--second-ink); }
+  .cell.c2 { background:var(--result); color:var(--result-ink); }
+  .cell.c3 { background:var(--paper); border:1px solid var(--line); color:var(--ink); }
+  .cell.c4 { background:var(--tagsell); color:var(--tagsell-ink); }
+  .cell.c5 { background:var(--lossbg); color:var(--danger); }
+  details { margin-top:12px; } summary { cursor:pointer; font-weight:600; padding:6px 0; }
+  td .sub { display:block; font-size:.68rem; color:var(--muted); font-weight:400; }
+  tr.cur td { background:var(--result); color:var(--result-ink); }
+  tr.cur td .sub { color:var(--result-ink); opacity:.75; }
+  .empty { color:var(--muted); padding:14px 2px; }
+
+  .head { position:relative; }
+  /* ---- الصفحات كملفات: الأمامية تغطّي البقية ---- */
+  .tabs { position:relative; z-index:4; display:grid; grid-template-columns:repeat(2, 1fr); gap:4px; align-items:stretch;
+    margin:12px 0 0; margin-bottom:-1px; }
+  .ftab { position:relative; display:flex; margin-top:7px; background:var(--line); border:1px solid var(--line); border-bottom:0;
+    border-radius:12px 12px 0 0; transition:margin-top .28s cubic-bezier(.3,.8,.3,1), background-color .28s; }
+  .ftab.active { margin-top:0; background:var(--card); }
+  .tabbtn { flex:1; min-width:0; padding:12px 8px; padding-inline-end:24px; border:0; background:transparent; color:var(--muted);
+    font-weight:800; font-size:1rem; line-height:1.3; text-align:center; transition:color .25s; }
+  .ftab.active .tabbtn { color:var(--ink); }
+  .ftab > .info { position:absolute; inset-inline-end:6px; top:50%; margin:0; transform:translateY(-50%); z-index:2; color:var(--muted); }
+  .ftab.active > .info { color:var(--ink); }
+  .folders { position:relative; padding-bottom:18px; }
+  .folders::before, .folders::after { content:""; position:absolute; z-index:0; background:var(--card); border:1px solid var(--line);
+    border-radius:0 0 14px 14px; }
+  .folders::before { inset-inline:24px; bottom:0; height:30px; opacity:.65; }
+  .folders::after { inset-inline:12px; bottom:9px; height:30px; opacity:.9; }
+  .fsheet { position:relative; z-index:1; background:var(--card); border:1px solid var(--line); border-radius:0 0 14px 14px;
+    padding:6px 14px 16px; box-shadow:0 2px 6px rgba(19,35,63,.07); }
+  .fsheet > .panel { background:transparent; border:0; padding:0; margin-top:8px; }
+  .fsheet.coming { z-index:3; animation:comeFront .4s cubic-bezier(.2,.8,.2,1) both; }
+  .fsheet.going { position:absolute; top:0; inset-inline:0; z-index:2; pointer-events:none; animation:goBack .4s ease both; }
+  @keyframes comeFront { from { transform:translateY(18px) scale(.94); opacity:.4; } to { transform:none; opacity:1; } }
+  @keyframes goBack { from { transform:none; opacity:1; } to { transform:translateY(14px) scale(.93); opacity:.25; } }
+  .menu { position:absolute; top:calc(100% + 4px); inset-inline-end:0; z-index:30; min-width:220px; padding:6px;
+    background:var(--card); border:1px solid var(--line); border-radius:12px; box-shadow:0 10px 28px rgba(0,0,0,.22); animation:pageIn .16s ease-out; }
+  .menu button { display:flex; width:100%; align-items:center; justify-content:space-between; gap:14px; padding:11px 12px;
+    border:0; border-radius:8px; background:transparent; color:var(--ink); font-weight:600; text-align:start; }
+  .menu button:hover, .menu button:active { background:var(--paper); }
+  .menu small { color:var(--muted); font-weight:700; }
+  .spage { position:fixed; inset:0; z-index:40; display:flex; flex-direction:column; background:var(--paper); animation:pageIn .22s ease-out; }
+  .sbar { display:flex; align-items:center; gap:10px; padding:12px 14px; background:var(--card); border-bottom:1px solid var(--line); }
+  .sbar h2 { margin:0; font-size:1.05rem; }
+  .backbtn { display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; padding:0; border:1px solid var(--line);
+    border-radius:10px; background:var(--paper); color:var(--ink); }
+  html[dir="rtl"] .backbtn svg { transform:scaleX(-1); }
+  .sbody { flex:1; overflow:auto; width:100%; max-width:620px; margin:0 auto; padding:16px 14px; -webkit-overflow-scrolling:touch; }
+  .sfoot { display:flex; gap:10px; padding:12px 14px calc(12px + env(safe-area-inset-bottom)); background:var(--card); border-top:1px solid var(--line); }
+  .sfoot .btn { margin-top:0; width:auto; flex:1.5; }
+  .sfoot .btn2 { flex:1; padding:10px 8px; font-size:.9rem; }
+  .res, .tb { position:relative; }
+  .res { display:flex; flex-direction:column-reverse; }
+  /* محاذاة: العنوان في الأعلى والقيمة/الخانة في الأسفل، فتصطف الأرقام مهما اختلف طول العناوين */
+  .grid > div, .pair > .f { display:flex; flex-direction:column-reverse; justify-content:flex-end; }
+  .grid > div > label, .pair > .f > label { margin:5px 0 0; }
+  #bkRow { display:flex; flex-direction:column-reverse; }
+  #bkRow > label { margin:5px 0 0; }
+  .tb { display:flex; flex-direction:column-reverse; justify-content:space-between; }
+  .cell { display:flex; flex-direction:column-reverse; justify-content:space-between; }
+  .mini input:not([type]), .ro { height:40px; padding:0 9px; box-sizing:border-box; }
+  .mini .stp { min-height:17px; }
+  .copy-btn { position:absolute; top:8px; inset-inline-end:8px; width:21px; height:21px; padding:0; display:inline-flex;
+    align-items:center; justify-content:center; border:1.3px solid currentColor; border-radius:8px; background:transparent;
+    color:inherit; opacity:.65; }
+  .copy-btn:hover, .copy-btn:active { opacity:1; }
+  .copy-btn svg { display:block; width:11px; height:11px; }
+  .tb .copy-btn { top:5px; inset-inline-end:5px; width:16px; height:16px; border-radius:6px; }
+  .tb .copy-btn svg { width:9px; height:9px; }
+  .mini { margin-top:12px; }
+  .mini label { font-size:.76rem; line-height:1.3; }
+  .mini input:not([type]), .ro { font-size:.92rem; padding:7px 9px; }
+  .ro { display:flex; align-items:center; justify-content:flex-end; min-height:38px; font-weight:700; direction:ltr;
+    background:var(--paper); border:1px solid var(--line); border-radius:10px; font-variant-numeric:tabular-nums; }
+  /* ---- خانات الإدخال في جهة والنتائج في الجهة المقابلة ---- */
+  .pair { display:grid; grid-template-columns:1fr 1fr; gap:12px; align-items:stretch; }
+  .pair > .mini { margin-top:0; }
+  .rcell { position:relative; min-width:0; display:flex; flex-direction:column-reverse; justify-content:center;
+    margin-top:0; padding:10px 12px; border-radius:12px; background:var(--paper); border:1px solid var(--line); color:var(--ink); }
+  .rcell .name { font-size:.78rem; line-height:1.3; opacity:.88; padding:0; }
+  .rcell .val, .rcell .big { font-size:1.5rem; font-weight:800; line-height:1.25; direction:ltr; text-align:right; font-variant-numeric:tabular-nums; }
+  .rcell .unit { font-size:.78rem; font-weight:600; }
+  .pair .res.a { background:var(--second); border-color:transparent; color:var(--second-ink); }
+  .pair .res.b { background:var(--result); border-color:transparent; color:var(--result-ink); }
+  .rcell.gain { background:var(--tagsell); border-color:transparent; color:var(--tagsell-ink); }
+  .rcell.loss { background:var(--lossbg); border-color:transparent; color:var(--danger); }
+  html[dir="ltr"] .rcell .val, html[dir="ltr"] .rcell .big { text-align:left; }
+  .pair > .f:not(.mini) input:not([type]), .pair > .f > .ro { height:46px; box-sizing:border-box; }
+  .pair > .f > .ro { padding:0 12px; font-size:1.05rem; gap:6px; }
+  .ro .unit { font-size:.78rem; font-weight:600; opacity:.85; }
+  .pair .res.a { padding:16px 14px; }
+  .pair .res.a .big { font-size:2.2rem; }
+  #sProfitCell { padding:16px 14px; }
+  #sProfitCell .val { font-size:2.2rem; }
+  /* ---- شريط النتائج متعدد العملات ---- */
+  .topbar { grid-template-columns:repeat(6, 1fr); }
+  .topbar .tb { grid-column:span 2; }
+  .topbar[data-n="2"] .tb, .topbar[data-n="3"] .tb.g, .topbar[data-n="3"] .tb.q { grid-column:span 3; }
+  .topbar[data-n="3"] .tb.b { grid-column:span 2; }
+  .tb.q { background:var(--second); color:var(--second-ink); }
+  .curbtn { flex:0 0 auto; min-width:40px; padding:0 6px; border:1px solid var(--line); border-radius:10px; background:var(--paper);
+    color:var(--ink); font-weight:800; font-size:.85rem; }
+  .curbtn:active { background:var(--second); }
+  .sh2 { font-size:.95rem; margin:18px 0 8px; padding-top:12px; border-top:1px solid var(--line); }
+  #feesDZD > .sh2:first-child, #feesEUR > .sh2:first-child, #feesUSD > .sh2:first-child { margin-top:14px; }
+  #secFees > div:first-child:not([hidden]) > .sh2:first-child { margin-top:0; padding-top:0; border-top:0; }
+  .grid.rates { margin-top:14px; }
+  /* ---- شريط النتائج: الكمية والربح الإجمالي، ثم الربح وسعر البيع لكل عملة ---- */
+  .results { margin-top:12px; }
+  .results .cells { margin-bottom:0; }
+  .results .cur-cols, .results .cells { gap:6px; }
+  .curcol { gap:6px; }
+  .cell { position:relative; }
+  .cell .subv { margin-top:2px; font-size:.66rem; font-weight:700; line-height:1.4; opacity:.85; direction:ltr; }
+  .cur-cols { display:grid; grid-template-columns:1fr; gap:8px; margin-top:8px; }
+  .results[data-n="2"] .cur-cols { grid-template-columns:repeat(2, 1fr); }
+  .results[data-n="3"] .cur-cols { grid-template-columns:repeat(3, 1fr); }
+  .curcol { display:flex; flex-direction:column; gap:8px; min-width:0; }
+  .cell .copy-btn { top:6px; inset-inline-end:6px; width:18px; height:18px; border-radius:6px; }
+  .cell .copy-btn svg { width:10px; height:10px; }
+  .gcell .stepper input:not([type]) { background:transparent; border:0; border-radius:0; box-shadow:none; padding:0; height:auto;
+    font-size:1.15rem; font-weight:800; color:inherit; min-width:0; }
+  .gcell .stp-col { flex-basis:30px; }
+  .gcell .stp { min-height:15px; font-size:.6rem; }
+  .gcell .stepper { gap:4px; }
+  /* ---- شريط التنقل السفلي (ثلاث صفحات منفصلة) ---- */
+  .bottomnav { position:fixed; left:0; right:0; bottom:0; z-index:20; display:grid; grid-template-columns:repeat(3, 1fr);
+    padding:6px 8px calc(6px + env(safe-area-inset-bottom)); background:var(--card); border-top:1px solid var(--line);
+    background:color-mix(in srgb, var(--card) 90%, transparent); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); }
+  .bottomnav > button { display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 2px; border:0; background:transparent;
+    color:var(--muted); font-size:.72rem; font-weight:700; line-height:1.2; transition:color .2s; }
+  .bottomnav > button svg { width:24px; height:24px; transition:transform .25s cubic-bezier(.3,.8,.3,1); }
+  .bottomnav > button[aria-selected="true"] { color:var(--accent); }
+  .bottomnav > button[aria-selected="true"] svg { transform:translateY(-1px) scale(1.08); }
+  .solo { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:6px 14px 16px; margin-top:12px;
+    box-shadow:0 2px 6px rgba(19,35,63,.07); }
+  .solo > .panel { background:transparent; border:0; padding:0; margin-top:8px; }
+  /* ---- اتجاه LTR (الفرنسية والإنجليزية) ---- */
+  html[dir="ltr"] input:not([type]) { text-align:left; }
+  html[dir="ltr"] .res .big, html[dir="ltr"] .cell .val, html[dir="ltr"] .tb .val { text-align:left; }
+  html[dir="ltr"] th, html[dir="ltr"] td { text-align:left; }
+  html[dir="ltr"] .ro { justify-content:flex-start; }
+  #bkRow { margin-top:14px; }
+</style>
+</head>
+<body>
+<main>
+  <header class="head">
+    <h1 data-i18n="title">حاسبة P2P USDT</h1>
+    <button type="button" class="btn2" id="settingsBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="settingsMenu" aria-label="الإعدادات" title="الإعدادات">⚙</button>
+    <div class="menu" id="settingsMenu" role="menu" hidden>
+      <button type="button" role="menuitem" data-sec="fees"><span data-i18n="menu_fees">إعدادات الرسوم</span></button>
+      <button type="button" role="menuitem" data-sec="cur"><span data-i18n="menu_cur">اختيار العملة</span><small id="menuCur"></small></button>
+      <button type="button" role="menuitem" data-sec="lang"><span data-i18n="menu_lang">اختيار اللغة</span><small id="menuLang"></small></button>
+    </div>
+  </header>
+
+  <div class="results" id="topbar" data-n="1">
+    <div class="cells">
+      <div class="cell c3">
+        <div class="name" id="qtyName"><span data-i18n="top_qty">كمية USDT</span></div>
+        <div class="val"><span id="topQ">0.00</span> <span class="unit">USDT</span></div>
+      </div>
+      <div class="cell c3" id="cTot">
+        <div class="name" id="totName"><span data-i18n="top_profit">الربح الإجمالي</span></div>
+        <div class="val"><span id="topProfit">—</span> <span class="unit">USDT</span><div class="subv" id="topProfitSub"></div></div>
+      </div>
+    </div>
+    <div class="cur-cols">
+      <div class="curcol" id="col_DZD">
+        <div class="cell c3 gcell">
+          <label class="name" for="gDZD"><span data-i18n="lbl_gD">الربح المطلوب (دج)</span></label>
+          <input id="gDZD" inputmode="decimal" value="2,00" autocomplete="off">
+        </div>
+        <div class="cell c2" id="tbP_DZD">
+          <button type="button" class="copy-btn" data-src="topP_DZD" aria-label="نسخ القيمة"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg></button>
+          <div class="name pname"><span data-i18n="top_sell">سعر البيع المثالي</span></div>
+          <div class="val"><span id="topP_DZD">—</span> <span class="unit" data-cursym="DZD">دج</span></div>
+        </div>
+      </div>
+      <div class="curcol" id="col_EUR" hidden>
+        <div class="cell c3 gcell">
+          <label class="name" for="gEUR"><span data-i18n="lbl_gE">الربح المطلوب (€)</span></label>
+          <input id="gEUR" inputmode="decimal" value="0,010" autocomplete="off">
+        </div>
+        <div class="cell c2" id="tbP_EUR">
+          <button type="button" class="copy-btn" data-src="topP_EUR" aria-label="نسخ القيمة"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg></button>
+          <div class="name pname"><span data-i18n="top_sell">سعر البيع المثالي</span></div>
+          <div class="val"><span id="topP_EUR">—</span> <span class="unit" data-cursym="EUR">€</span></div>
+        </div>
+      </div>
+      <div class="curcol" id="col_USD" hidden>
+        <div class="cell c3 gcell">
+          <label class="name" for="gUSD"><span data-i18n="lbl_gU">الربح المطلوب ($)</span></label>
+          <input id="gUSD" inputmode="decimal" value="0,010" autocomplete="off">
+        </div>
+        <div class="cell c2" id="tbP_USD">
+          <button type="button" class="copy-btn" data-src="topP_USD" aria-label="نسخ القيمة"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg></button>
+          <div class="name pname"><span data-i18n="top_sell">سعر البيع المثالي</span></div>
+          <div class="val"><span id="topP_USD">—</span> <span class="unit" data-cursym="USD">$</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section id="viewOps" class="view">
+  <div class="tabs" id="tabs" role="tablist" aria-label="الصفحات">
+    <div class="ftab active" id="ftabBuy"><button type="button" class="tabbtn" role="tab" id="tabBuy" aria-selected="true" data-i18n="tab_buy">الشراء</button></div>
+    <div class="ftab" id="ftabSell"><button type="button" class="tabbtn" role="tab" id="tabSell" aria-selected="false" data-i18n="tab_sell">البيع</button></div>
+  </div>
+
+  <div class="folders" id="folders">
+    <section id="pageBuy" class="fsheet">
+    <div class="panel">
+      <div class="pair">
+        <div class="f">
+          <label for="a"><span data-i18n="lbl_a">مبلغ الشراء (دج)</span></label>
+          <input id="a" inputmode="decimal" placeholder="12800" autocomplete="off">
+        </div>
+        <div class="f">
+          <label id="netqLabel"><span data-i18n="lbl_netq">الكمية الصافية المشتراة (USDT)</span></label>
+          <div class="ro"><span id="netQ">—</span></div>
+        </div>
+        <div class="f">
+          <label for="p"><span data-i18n="lbl_p">السعر المعلن (دج/USDT)</span></label>
+          <input id="p" inputmode="decimal" placeholder="255,06" autocomplete="off">
+        </div>
+        <div class="res a rcell" role="status" aria-live="polite">
+          <button type="button" class="copy-btn" data-src="curReal" aria-label="نسخ القيمة"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg></button>
+          <div class="name"><span data-i18n="cur_real">التكلفة الفعلية لشراء الوحدة</span></div>
+          <div class="big"><span id="curReal">—</span> <span class="unit" id="curRealU">دج</span></div>
+        </div>
+        <div class="f mini" id="bkfBox" hidden>
+          <label for="bkf"><span data-i18n="lbl_bkf">رسوم التحويل البنكي</span></label>
+          <input id="bkf" inputmode="decimal" autocomplete="off">
+        </div>
+      </div>
+    </div>
+    <button class="btn" id="save" disabled data-i18n="btn_save">تسجيل عملية الشراء</button>
+  </section>
+    <section id="pageSell" class="fsheet" hidden>
+    <div class="panel">
+      <div class="pair">
+        <div class="f">
+          <label for="sq"><span data-i18n="lbl_sq">الكمية المباعة (USDT)</span></label>
+          <input id="sq" inputmode="decimal" autocomplete="off">
+        </div>
+        <div class="f">
+          <label id="sAmtName"><span data-i18n="sell_amount">مبلغ البيع</span></label>
+          <div class="ro"><span id="sAmt">—</span><span class="unit" id="sAmtU">دج</span></div>
+        </div>
+        <div class="f">
+          <label for="sp"><span data-i18n="lbl_sp">سعر البيع (دج/USDT)</span></label>
+          <input id="sp" inputmode="decimal" autocomplete="off">
+        </div>
+        <div class="rcell" id="sProfitCell">
+          <div class="name" id="sProfitName"><span data-i18n="sell_profit">ربح العملية</span></div>
+          <div class="val"><span id="sProfit">—</span> <span class="unit" id="sProfU">دج</span></div>
+        </div>
+      </div>
+    </div>
+    <button class="btn" id="ssave" disabled data-i18n="btn_ssave">تسجيل عملية البيع</button>
+  </section>
+    
+  </div>
+  </section>
+
+  <section id="viewTarget" class="view" hidden>
+    <section id="pageTarget" class="solo">
+    <div class="panel">
+      <div class="pair">
+        <div class="f" style="grid-area:1/1">
+          <label for="ts"><span data-i18n="lbl_ts">سعر البيع (دج/USDT)</span></label>
+          <input id="ts" inputmode="decimal" placeholder="255" autocomplete="off">
+        </div>
+        <div class="f" style="grid-area:2/1">
+          <label for="ta"><span data-i18n="lbl_ta">مبلغ الشراء (اختياري)</span></label>
+          <input id="ta" inputmode="decimal" placeholder="12800" autocomplete="off">
+        </div>
+        <div class="res b rcell" style="grid-area:1/2/3/3">
+          <button type="button" class="copy-btn" id="tCopy" data-v="" aria-label="نسخ القيمة"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg></button>
+          <div class="name" id="tName"><span data-i18n="t_buy_label">اشترِ عند هذا السعر أو أقل</span></div>
+          <div class="big"><span id="tVal">—</span> <span class="unit" id="tU">دج</span></div>
+        </div>
+      </div>
+    </div>
+    <div id="tout"></div>
+  </section>
+  </section>
+
+  <!-- السجل المشترك -->
+  <div id="viewLog" class="view" hidden>
+    <section class="panel" id="logs" aria-label="سجل العمليات">
+    <h2 data-i18n="log_title">سجل العمليات</h2>
+    <div id="sum"></div>
+    <div id="log"></div>
+    <div class="logbar">
+      <button class="btn2" id="copy" hidden data-i18n="copy">نسخ الجدول</button>
+      <button class="btn2" id="clear" hidden data-i18n="clear">مسح الكل</button>
+    </div>
+    <p class="hint" data-i18n="log_hint"></p>
+  </section>
+  </div>
+</main>
+<nav class="bottomnav" id="bnav" role="tablist" aria-label="الصفحات">
+  <button type="button" role="tab" id="navOps" aria-selected="true" data-view="ops"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3L4 7l4 4"/><path d="M4 7h16"/><path d="M16 21l4-4-4-4"/><path d="M20 17H4"/></svg><span data-i18n="nav_ops">العمليات</span></button>
+  <button type="button" role="tab" id="navLog" aria-selected="false" data-view="log"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/></svg><span data-i18n="nav_log">السجل</span></button>
+  <button type="button" role="tab" id="navTarget" aria-selected="false" data-view="target"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span data-i18n="nav_target">السعر المستهدف</span></button>
+</nav>
+<div class="spage" id="settingsPage" role="dialog" aria-modal="true" hidden>
+  <div class="sbar">
+    <button type="button" class="backbtn" id="setBack" aria-label="رجوع"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <h2 id="setTitle"></h2>
+  </div>
+  <div class="sbody" id="setBody">
+    <section id="secFees" hidden>
+      <div id="feesDZD">
+        <h3 class="sh2"><span data-i18n="fee_h_DZD">الدينار (DZD)</span></h3>
+        <div class="grid">
+          <div><label for="fb"><span data-i18n="lbl_fb">رسوم الشراء (%)</span></label><input id="fb" inputmode="decimal" value="0,2" autocomplete="off"></div>
+          <div><label for="fs"><span data-i18n="lbl_fs">رسوم البيع (%)</span></label><input id="fs" inputmode="decimal" value="0,2" autocomplete="off"></div>
+        </div>
+        <label class="switch" for="bm">
+          <input type="checkbox" id="bm" checked>
+          <span class="slider" aria-hidden="true"></span>
+          <span class="lbl" data-i18n="sw_fee">احتساب رسوم بريدي موب في الحساب</span>
+        </label>
+        <div class="scroll" id="bmTable"><table>
+          <thead><tr><th data-i18n="th_range">مجال المبلغ (دج)</th><th data-i18n="th_baridi">خصم بريدي موب</th></tr></thead>
+          <tbody id="bmBody"></tbody>
+        </table></div>
+      </div>
+      <div id="feesEUR" hidden>
+        <h3 class="sh2"><span data-i18n="fee_h_EUR">اليورو (EUR)</span></h3>
+        <div class="grid">
+          <div><label for="eb"><span data-i18n="lbl_fb">رسوم الشراء (%)</span></label><input id="eb" inputmode="decimal" value="0" autocomplete="off"></div>
+          <div><label for="es"><span data-i18n="lbl_fs">رسوم البيع (%)</span></label><input id="es" inputmode="decimal" value="0" autocomplete="off"></div>
+          <div><label for="ebk"><span data-i18n="lbl_ebk">رسم التحويل الثابت (€)</span></label><input id="ebk" inputmode="decimal" value="0,00" autocomplete="off"></div>
+        </div>
+      </div>
+      <div id="feesUSD" hidden>
+        <h3 class="sh2"><span data-i18n="fee_h_USD">الدولار (USD)</span></h3>
+        <div class="grid">
+          <div><label for="ub"><span data-i18n="lbl_fb">رسوم الشراء (%)</span></label><input id="ub" inputmode="decimal" value="0" autocomplete="off"></div>
+          <div><label for="us"><span data-i18n="lbl_fs">رسوم البيع (%)</span></label><input id="us" inputmode="decimal" value="0" autocomplete="off"></div>
+          <div><label for="ubk"><span data-i18n="lbl_ubk">رسم التحويل الثابت ($)</span></label><input id="ubk" inputmode="decimal" value="0,00" autocomplete="off"></div>
+        </div>
+      </div>
+    </section>
+    <section id="secCur" hidden>
+      <div class="seg" id="curSeg" role="group" aria-label="العملات">
+        <button type="button" data-v="DZD" aria-pressed="true">DZD</button>
+        <button type="button" data-v="EUR" aria-pressed="false">€ EUR</button>
+        <button type="button" data-v="USD" aria-pressed="false">$ USD</button>
+      </div>
+      <div class="grid rates" id="rates">
+        <div id="rowEUR" hidden><label for="rEUR"><span data-i18n="lbl_reur">سعر 1 € بالدينار (دج)</span></label><input id="rEUR" inputmode="decimal" value="275" autocomplete="off"></div>
+        <div id="rowUSD" hidden><label for="rUSD"><span data-i18n="lbl_rusd">سعر 1 $ بالدينار (دج)</span></label><input id="rUSD" inputmode="decimal" value="" placeholder="0,00" autocomplete="off"></div>
+      </div>
+    </section>
+    <section id="secLang" hidden>
+      <div class="seg" id="langSeg" role="group" aria-label="اللغة">
+        <button type="button" data-v="ar" aria-pressed="true">عربي</button>
+        <button type="button" data-v="fr" aria-pressed="false">Français</button>
+        <button type="button" data-v="en" aria-pressed="false">English</button>
+      </div>
+    </section>
+  </div>
+  <div class="sfoot">
+    <button type="button" class="btn" id="setSave" data-i18n="save_settings">حفظ</button>
+    <button type="button" class="btn2" id="setReset" data-i18n="reset_settings">الإعدادات الأولى</button>
+  </div>
+</div>
+<div class="tip" id="tip" role="dialog" hidden><div class="tt"></div><div class="td"></div></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var sManual = { sq: false, sp: false };
+  var last = null, ops = [], counter = 0;
+  var baridiOn = true, lang = "ar", bfManual = false;
+
+  /* ---------- الترجمة ---------- */
+  var T = {
+    ar: {
+      t_buy_label: "اشترِ عند هذا السعر أو أقل",
+      menu_fees: "إعدادات الرسوم", menu_cur: "اختيار العملة", menu_lang: "اختيار اللغة", save_settings: "حفظ", reset_settings: "الإعدادات الأولى", back: "رجوع", toast_saved: "تم حفظ الإعدادات ✓",
+      lbl_bkf: "رسوم التحويل البنكي ({u})", lbl_netq: "الكمية الصافية المشتراة (USDT)", copy_value: "نسخ القيمة",
+      title: "حاسبة P2P USDT", settings: "الإعدادات", pages: "الصفحات", sec_fees: "الرسوم",
+      lbl_fb: "رسوم الشراء (%)", lbl_fs: "رسوم البيع (%)", sw_fee: "احتساب {fee} في الحساب",
+      fee_dz: "رسوم بريدي موب", fee_ot: "رسوم التحويل البنكي",
+      th_range: "مجال المبلغ ({u})", th_baridi: "خصم بريدي موب", and_above: "فما فوق",
+      lbl_bk: "رسوم التحويل البنكي ({u}، مبلغ ثابت)", sec_lang: "اللغة", sec_cur: "العملة",
+      lbl_g: "الربح المطلوب ({u})", top_real: "متوسط التكلفة الفعلية", top_sell: "متوسط سعر البيع المثالي",
+      tab_buy: "الشراء", tab_sell: "البيع", tab_target: "سعر الشراء المستهدف",
+      lbl_a: "مبلغ الشراء ({u})", lbl_p: "السعر المعلن ({u}/USDT)", cur_real: "التكلفة الفعلية لشراء الوحدة",
+      btn_save: "تسجيل عملية الشراء", lbl_sq: "الكمية المباعة (USDT)", lbl_sp: "سعر البيع ({u}/USDT)",
+      btn_ssave: "تسجيل عملية البيع", lbl_ts: "سعر البيع ({u}/USDT)", lbl_ta: "مبلغ الشراء (اختياري)",
+      log_title: "سجل العمليات", copy: "نسخ الجدول", clear: "مسح الكل",
+      log_hint: "عند فتح البرنامج في المتصفح (خارج Claude) يُحفظ السجل تلقائيًا على جهازك. داخل Claude لا يُحفظ، فاستخدم «نسخ الجدول».",
+      copied: "تم النسخ ✓", copy_fail: "تعذّر النسخ", confirm_clear: "مسح كل العمليات المسجلة؟",
+      empty_log: "لا توجد عمليات مسجلة بعد.", th_inc: "احتساب",
+      c_type: "النوع", c_time: "الوقت", c_amount: "المبلغ", c_price: "السعر الفعلي", c_net: "الكمية الصافية", c_profit: "الربح",
+      c_listed: "السعر المعلن", c_bought: "الكمية المشتراة", c_afterbuy: "بعد خصم الشراء",
+      buy: "شراء", sell: "بيع", toast_buy: "تم تسجيل عملية الشراء ✓", toast_sell: "تم تسجيل عملية البيع ✓",
+      remain: "الكمية المتبقية", profit: "الربح", sell_amount: "مبلغ البيع", sell_cost: "التكلفة (متوسط {0})", sell_profit: "ربح العملية",
+      t_buy_at: "اشترِ عند هذا السعر أو أقل (لمبلغ {0} {u})",
+      th_fee_short: "الرسم", th_low: "عند أدنى المبلغ", th_high: "عند أعلى المبلغ", th_amount: "المبلغ ({u})", th_target: "سعر الشراء المستهدف",
+      explain: "شرح", up: "زيادة", down: "إنقاص", del_row: "حذف السطر", inc_aria: "احتساب العملية في المتوسط"
+    },
+    fr: {
+      t_buy_label: "Achetez à ce prix ou moins",
+      menu_fees: "Paramètres des frais", menu_cur: "Choix de la devise", menu_lang: "Choix de la langue", save_settings: "Enregistrer", reset_settings: "Réglages initiaux", back: "Retour", toast_saved: "Réglages enregistrés ✓",
+      lbl_bkf: "Frais de virement bancaire ({u})", lbl_netq: "Quantité nette achetée (USDT)", copy_value: "Copier la valeur",
+      title: "Calculateur P2P USDT", settings: "Paramètres", pages: "Pages", sec_fees: "Frais",
+      lbl_fb: "Frais d'achat (%)", lbl_fs: "Frais de vente (%)", sw_fee: "Inclure les {fee} dans le calcul",
+      fee_dz: "frais Baridi Mob", fee_ot: "frais de virement bancaire",
+      th_range: "Tranche du montant ({u})", th_baridi: "Frais Baridi Mob", and_above: "et plus",
+      lbl_bk: "Frais de virement bancaire ({u}, montant fixe)", sec_lang: "Langue", sec_cur: "Devise",
+      lbl_g: "Profit visé ({u})", top_real: "Coût réel moyen", top_sell: "Prix de vente idéal moyen",
+      tab_buy: "Achat", tab_sell: "Vente", tab_target: "Prix d'achat cible",
+      lbl_a: "Montant d'achat ({u})", lbl_p: "Prix annoncé ({u}/USDT)", cur_real: "Coût réel d'achat par unité",
+      btn_save: "Enregistrer l'achat", lbl_sq: "Quantité vendue (USDT)", lbl_sp: "Prix de vente ({u}/USDT)",
+      btn_ssave: "Enregistrer la vente", lbl_ts: "Prix de vente ({u}/USDT)", lbl_ta: "Montant d'achat (facultatif)",
+      log_title: "Journal des opérations", copy: "Copier le tableau", clear: "Tout effacer",
+      log_hint: "Ouverte dans le navigateur (hors Claude), l'application enregistre le journal automatiquement sur votre appareil. Dans Claude, rien n'est sauvegardé : utilisez « Copier le tableau ».",
+      copied: "Copié ✓", copy_fail: "Échec de la copie", confirm_clear: "Effacer toutes les opérations enregistrées ?",
+      empty_log: "Aucune opération enregistrée.", th_inc: "Inclure",
+      c_type: "Type", c_time: "Heure", c_amount: "Montant", c_price: "Prix réel", c_net: "Quantité nette", c_profit: "Profit",
+      c_listed: "Prix annoncé", c_bought: "Quantité achetée", c_afterbuy: "Après frais d'achat",
+      buy: "Achat", sell: "Vente", toast_buy: "Achat enregistré ✓", toast_sell: "Vente enregistrée ✓",
+      remain: "Quantité restante", profit: "Profit", sell_amount: "Montant de la vente", sell_cost: "Coût (moyenne {0})", sell_profit: "Profit de l'opération",
+      t_buy_at: "Achetez à ce prix ou moins (pour un montant de {0} {u})",
+      th_fee_short: "Frais", th_low: "Au montant min.", th_high: "Au montant max.", th_amount: "Montant ({u})", th_target: "Prix d'achat cible",
+      explain: "Explication", up: "Augmenter", down: "Diminuer", del_row: "Supprimer la ligne", inc_aria: "Inclure l'opération dans la moyenne"
+    },
+    en: {
+      t_buy_label: "Buy at this price or lower",
+      menu_fees: "Fee settings", menu_cur: "Choose currency", menu_lang: "Choose language", save_settings: "Save", reset_settings: "Initial settings", back: "Back", toast_saved: "Settings saved ✓",
+      lbl_bkf: "Bank transfer fee ({u})", lbl_netq: "Net quantity bought (USDT)", copy_value: "Copy value",
+      title: "P2P USDT Calculator", settings: "Settings", pages: "Pages", sec_fees: "Fees",
+      lbl_fb: "Buy fee (%)", lbl_fs: "Sell fee (%)", sw_fee: "Include {fee} in the calculation",
+      fee_dz: "Baridi Mob fee", fee_ot: "bank transfer fee",
+      th_range: "Amount range ({u})", th_baridi: "Baridi Mob fee", and_above: "and above",
+      lbl_bk: "Bank transfer fee ({u}, fixed amount)", sec_lang: "Language", sec_cur: "Currency",
+      lbl_g: "Target profit ({u})", top_real: "Average real cost", top_sell: "Average ideal sell price",
+      tab_buy: "Buy", tab_sell: "Sell", tab_target: "Target buy price",
+      lbl_a: "Purchase amount ({u})", lbl_p: "Listed price ({u}/USDT)", cur_real: "Real purchase cost per unit",
+      btn_save: "Record purchase", lbl_sq: "Quantity sold (USDT)", lbl_sp: "Sell price ({u}/USDT)",
+      btn_ssave: "Record sale", lbl_ts: "Sell price ({u}/USDT)", lbl_ta: "Purchase amount (optional)",
+      log_title: "Operations log", copy: "Copy table", clear: "Clear all",
+      log_hint: "When opened in a browser (outside Claude), the log is saved automatically on your device. Inside Claude nothing is saved, so use “Copy table”.",
+      copied: "Copied ✓", copy_fail: "Copy failed", confirm_clear: "Clear all recorded operations?",
+      empty_log: "No operations recorded yet.", th_inc: "Include",
+      c_type: "Type", c_time: "Time", c_amount: "Amount", c_price: "Real price", c_net: "Net quantity", c_profit: "Profit",
+      c_listed: "Listed price", c_bought: "Quantity bought", c_afterbuy: "After buy fee",
+      buy: "Buy", sell: "Sell", toast_buy: "Purchase recorded ✓", toast_sell: "Sale recorded ✓",
+      remain: "Remaining quantity", profit: "Profit", sell_amount: "Sale amount", sell_cost: "Cost (average {0})", sell_profit: "Profit of this sale",
+      t_buy_at: "Buy at this price or lower (for an amount of {0} {u})",
+      th_fee_short: "Fee", th_low: "At lowest amount", th_high: "At highest amount", th_amount: "Amount ({u})", th_target: "Target buy price",
+      explain: "Explanation", up: "Increase", down: "Decrease", del_row: "Delete row", inc_aria: "Include operation in the average"
+    }
+  };
+
+  var TIPS = {
+    ar: {
+      sellAmt: ["مبلغ البيع", "المبلغ الذي ستحصل عليه: الكمية × سعر البيع."],
+      sellProfit: ["ربح العملية", "الفرق بين مبلغ البيع وتكلفة الكمية المباعة، محسوبة على متوسط تكلفة مشترياتك."],
+      tRes: ["السعر المستهدف", "أعلى سعر شراء تقبل به لتحقق ربحك عند سعر البيع ومبلغ الشراء المكتوبين. انسخه واستعمله في إعلانك."],
+      bkf: ["{Fee}", "رسم التحويل لهذه العملية ({u}). يظهر تلقائيًا المبلغ المكتوب في الإعدادات، ويمكنك كتابة قيمة أخرى. يدخل في حساب التكلفة الفعلية."],
+      netq: ["الكمية الصافية المشتراة", "الكمية المشتراة (المبلغ ÷ السعر) بعد طرح رسوم الشراء ورسوم البيع. عليها تُبنى التكلفة الفعلية والربح."],
+      a: ["مبلغ الشراء", "المبلغ ({u}) الذي ترسله لشراء USDT. يُضاف إليه {fee} لحساب التكلفة الفعلية."],
+      p: ["السعر المعلن", "سعر الوحدة ({u} لكل 1 USDT) في إعلان البائع على P2P. منه تُحسب الكمية: المبلغ ÷ السعر."],
+      g: ["الربح المطلوب", "الربح الذي تريده لكل 1 USDT ({u}). يُضاف إلى التكلفة الفعلية فيعطيك سعر البيع المثالي."],
+      curReal: ["التكلفة الفعلية لشراء الوحدة", "ما تكلّفك الوحدة فعليًا بعد رسوم الشراء والبيع و{fee}: (المبلغ + الرسم) ÷ الكمية الصافية. هو أقل سعر بيع بدون ربح."],
+      topReal: ["متوسط التكلفة الفعلية", "متوسط تكلفة الوحدة في كل عمليات الشراء المحتسبة، مع العملية التي تكتبها قبل تسجيلها. المتوسط مرجّح بالكمية."],
+      topSell: ["متوسط سعر البيع المثالي", "متوسط السعر الذي لا يجب أن تبيع تحته ليتحقق الربح المطلوب على مشترياتك المحتسبة."],
+      sq: ["الكمية المباعة", "كمية USDT الصافية التي تبيعها. يظهر تلقائيًا ما تبقى من مشترياتك، ويمكنك الكتابة فوقه."],
+      sp: ["سعر البيع", "سعر بيع الوحدة. يظهر تلقائيًا متوسط سعر البيع المثالي، ويمكنك تغييره. منه يُحسب مبلغ البيع والربح."],
+      ts: ["سعر البيع (للتحليل)", "أفضل سعر بيع معلن في P2P مثلًا. منه يُحسب أعلى سعر شراء يحقق ربحك."],
+      ta: ["مبلغ الشراء (اختياري)", "اكتب مبلغك لتعرف السعر المستهدف الخاص به. اتركه فارغًا لرؤية الجدول كاملًا."],
+      fb: ["رسوم الشراء", "النسبة التي تخصمها بينانس من الكمية عند الشراء (0.2% عادةً)."],
+      fs: ["رسوم البيع", "النسبة التي تخصمها بينانس من الكمية عند البيع (0.2% عادةً). تُحسب مسبقًا ضمن التكلفة الفعلية."],
+      bm: ["{Fee}", "عند التفعيل يُضاف {fee} إلى التكلفة. أوقفه إن لم يكن يُخصم منك."],
+      bk: ["{Fee}", "مبلغ ثابت ({u}) يُضاف إلى كل عملية شراء. اتركه 0 إن لم توجد رسوم."],
+      lang: ["اللغة", "لغة واجهة البرنامج."],
+      cur: ["العملة", "الرمز المعروض للمبالغ. لا يحوّل القيم."],
+      remain: ["الكمية المتبقية", "ما بقي لديك غير مباع من مشترياتك المحتسبة، بالـ USDT."],
+      profit: ["الربح", "مجموع أرباح عمليات البيع المسجلة، محسوبًا على متوسط تكلفة الشراء وقت كل بيع."],
+      settings: ["الإعدادات", "الرسوم واللغة والعملة."],
+      tabBuy: ["الشراء", "أدخل مبلغ الشراء والسعر المعلن لتعرف تكلفة الوحدة الفعلية، ثم سجّل العملية في السجل."],
+      tabSell: ["البيع", "سجّل بيع كمية بسعر معيّن لتعرف مبلغ البيع والربح. الكمية والسعر يُقترحان تلقائيًا."],
+      tabTarget: ["سعر الشراء المستهدف", "أداة تحليل: تعطيك أعلى سعر شراء تقبل به لتحقق ربحك عند سعر بيع معيّن، حسب مبلغ الشراء. الربح من الخانة العلوية والرسوم من الإعدادات. للأمان اعتمد عمود «أدنى المبلغ»، والأسعار مقرّبة للأسفل لضمان الربح."]
+    },
+    fr: {
+      sellAmt: ["Montant de la vente", "Ce que vous recevez : quantité × prix de vente."],
+      sellProfit: ["Profit de l'opération", "La différence entre le montant de la vente et le coût de la quantité vendue, calculée sur le coût moyen de vos achats."],
+      tRes: ["Prix d'achat cible", "Le prix d'achat maximal à accepter pour réaliser votre profit au prix de vente et au montant saisis. Copiez-le pour votre annonce."],
+      bkf: ["{Fee}", "Frais de virement pour cette opération ({u}). Le montant des paramètres s'affiche automatiquement ; vous pouvez saisir une autre valeur. Il entre dans le calcul du coût réel."],
+      netq: ["Quantité nette achetée", "La quantité achetée (montant ÷ prix) après déduction des frais d'achat et de vente. Le coût réel et le profit se calculent sur cette quantité."],
+      a: ["Montant d'achat", "Le montant ({u}) que vous envoyez pour acheter des USDT. Les {fee} s'y ajoutent pour calculer le coût réel."],
+      p: ["Prix annoncé", "Prix unitaire ({u} pour 1 USDT) dans l'annonce du vendeur P2P. La quantité s'en déduit : montant ÷ prix."],
+      g: ["Profit visé", "Le profit que vous voulez par USDT ({u}). Il s'ajoute au coût réel pour donner le prix de vente idéal."],
+      curReal: ["Coût réel d'achat par unité", "Ce que coûte vraiment une unité après les frais d'achat, de vente et les {fee} : (montant + frais) ÷ quantité nette. C'est le prix de vente minimum sans profit."],
+      topReal: ["Coût réel moyen", "Coût moyen par unité sur tous les achats inclus, avec l'opération que vous saisissez avant de l'enregistrer. Moyenne pondérée par la quantité."],
+      topSell: ["Prix de vente idéal moyen", "Le prix moyen sous lequel il ne faut pas vendre pour obtenir le profit visé sur vos achats inclus."],
+      sq: ["Quantité vendue", "Quantité nette d'USDT que vous vendez. Le reste de vos achats s'affiche automatiquement ; vous pouvez le modifier."],
+      sp: ["Prix de vente", "Prix de vente unitaire. Le prix de vente idéal moyen s'affiche automatiquement ; vous pouvez le modifier. Il sert à calculer le montant et le profit."],
+      ts: ["Prix de vente (analyse)", "Par exemple la meilleure annonce de vente P2P. On en déduit le prix d'achat maximal qui garantit votre profit."],
+      ta: ["Montant d'achat (facultatif)", "Saisissez votre montant pour obtenir son prix cible. Laissez vide pour voir tout le tableau."],
+      fb: ["Frais d'achat", "Pourcentage prélevé par Binance sur la quantité à l'achat (0,2 % en général)."],
+      fs: ["Frais de vente", "Pourcentage prélevé par Binance sur la quantité à la vente (0,2 % en général). Déjà intégré au coût réel."],
+      bm: ["{Fee}", "Activé, les {fee} s'ajoutent au coût. Désactivez-le s'ils ne vous sont pas facturés."],
+      bk: ["{Fee}", "Montant fixe ({u}) ajouté à chaque achat. Laissez 0 s'il n'y a pas de frais."],
+      lang: ["Langue", "Langue de l'interface."],
+      cur: ["Devise", "Symbole affiché pour les montants. Les valeurs ne sont pas converties."],
+      remain: ["Quantité restante", "Ce qu'il vous reste à vendre de vos achats inclus, en USDT."],
+      profit: ["Profit", "Total des profits des ventes enregistrées, calculé sur le coût moyen d'achat au moment de chaque vente."],
+      settings: ["Paramètres", "Frais, langue et devise."],
+      tabBuy: ["Achat", "Saisissez le montant d'achat et le prix annoncé pour connaître le coût réel par unité, puis enregistrez l'opération dans le journal."],
+      tabSell: ["Vente", "Enregistrez la vente d'une quantité à un prix donné pour connaître le montant et le profit. Quantité et prix sont proposés automatiquement."],
+      tabTarget: ["Prix d'achat cible", "Outil d'analyse : donne le prix d'achat maximal à accepter pour réaliser votre profit à un prix de vente donné, selon le montant d'achat. Le profit vient du champ en haut, les frais des paramètres. Par sécurité, utilisez la colonne « Au montant min. » ; les prix sont arrondis à la baisse pour garantir le profit."]
+    },
+    en: {
+      sellAmt: ["Sale amount", "What you receive: quantity × sell price."],
+      sellProfit: ["Operation profit", "The difference between the sale amount and the cost of the quantity sold, based on the average cost of your purchases."],
+      tRes: ["Target buy price", "The highest buy price you can accept to reach your profit at the sell price and amount entered. Copy it for your listing."],
+      bkf: ["{Fee}", "Transfer fee for this operation ({u}). The amount from Settings appears automatically; you can type another value. It is part of the real cost."],
+      netq: ["Net quantity bought", "The quantity bought (amount ÷ price) after buy and sell fees. The real cost and profit are based on this quantity."],
+      a: ["Purchase amount", "The amount ({u}) you send to buy USDT. The {fee} is added to it to work out the real cost."],
+      p: ["Listed price", "Unit price ({u} per 1 USDT) in the seller's P2P listing. The quantity is worked out as amount ÷ price."],
+      g: ["Target profit", "The profit you want per 1 USDT ({u}). It is added to the real cost to give the ideal sell price."],
+      curReal: ["Real purchase cost per unit", "What one unit really costs after buy and sell fees and the {fee}: (amount + fee) ÷ net quantity. It is the minimum sell price with no profit."],
+      topReal: ["Average real cost", "Average cost per unit across all included purchases, plus the operation you are typing before recording it. Weighted by quantity."],
+      topSell: ["Average ideal sell price", "The average price you should not sell below to reach your target profit on the included purchases."],
+      sq: ["Quantity sold", "Net USDT quantity you are selling. What is left of your purchases appears automatically; you can type over it."],
+      sp: ["Sell price", "Unit sell price. The average ideal sell price appears automatically; you can change it. It is used to work out the sale amount and profit."],
+      ts: ["Sell price (analysis)", "For example the best P2P sell listing. The highest buy price that secures your profit is worked out from it."],
+      ta: ["Purchase amount (optional)", "Type your amount to get its target price. Leave empty to see the whole table."],
+      fb: ["Buy fee", "Percentage Binance takes from the quantity when buying (usually 0.2%)."],
+      fs: ["Sell fee", "Percentage Binance takes from the quantity when selling (usually 0.2%). Already included in the real cost."],
+      bm: ["{Fee}", "When on, the {fee} is added to the cost. Turn it off if you are not charged."],
+      bk: ["{Fee}", "A fixed amount ({u}) added to every purchase. Leave it at 0 if there is no fee."],
+      lang: ["Language", "Interface language."],
+      cur: ["Currency", "Symbol shown for amounts. Values are not converted."],
+      remain: ["Remaining quantity", "What is left to sell from your included purchases, in USDT."],
+      profit: ["Profit", "Total profit of recorded sales, based on the average purchase cost at the time of each sale."],
+      settings: ["Settings", "Fees, language and currency."],
+      tabBuy: ["Buy", "Enter the purchase amount and listed price to see the real cost per unit, then record the operation in the log."],
+      tabSell: ["Sell", "Record the sale of a quantity at a price to see the sale amount and profit. Quantity and price are suggested automatically."],
+      tabTarget: ["Target buy price", "Analysis tool: gives the highest buy price you can accept to reach your profit at a given sell price, based on the purchase amount. The profit comes from the top field, fees from Settings. To be safe, use the “At lowest amount” column; prices are rounded down to guarantee the profit."]
+    }
+  };
+
+
+  /* ---------- تعديلات النصوص للعملات المتعددة ---------- */
+  Object.assign(T.ar, {
+    menu_cur: "العملات وأسعار الصرف", sec_cur: "العملات", top_qty: "كمية USDT", top_sell: "سعر البيع المثالي",
+    lbl_g: "الربح المطلوب ({gu})", lbl_a: "مبلغ الشراء ({bu})", lbl_p: "السعر المعلن ({bu}/USDT)",
+    lbl_sp: "سعر البيع ({su}/USDT)", lbl_ts: "سعر البيع ({tsu}/USDT)", lbl_ta: "مبلغ الشراء ({tbu}) — اختياري",
+    lbl_bkf: "رسم التحويل ({bu})", th_range: "مجال المبلغ ({dz})", th_amount: "المبلغ ({tbu})",
+    lbl_ebk: "رسم التحويل الثابت (€)", lbl_ubk: "رسم التحويل الثابت ($)",
+    lbl_reur: "سعر 1 € بالدينار ({dz})", lbl_rusd: "سعر 1 $ بالدينار ({dz})",
+    fee_h_DZD: "الدينار (DZD)", fee_h_EUR: "اليورو (EUR)", fee_h_USD: "الدولار (USD)", cur_switch: "تغيير العملة"
+  });
+  Object.assign(T.fr, {
+    menu_cur: "Devises et taux de change", sec_cur: "Devises", top_qty: "Quantité USDT", top_sell: "Prix de vente idéal",
+    lbl_g: "Profit visé ({gu})", lbl_a: "Montant d'achat ({bu})", lbl_p: "Prix annoncé ({bu}/USDT)",
+    lbl_sp: "Prix de vente ({su}/USDT)", lbl_ts: "Prix de vente ({tsu}/USDT)", lbl_ta: "Montant d'achat ({tbu}) — facultatif",
+    lbl_bkf: "Frais de virement ({bu})", th_range: "Tranche du montant ({dz})", th_amount: "Montant ({tbu})",
+    lbl_ebk: "Frais de virement fixes (€)", lbl_ubk: "Frais de virement fixes ($)",
+    lbl_reur: "Prix de 1 € en dinars ({dz})", lbl_rusd: "Prix de 1 $ en dinars ({dz})",
+    fee_h_DZD: "Dinar (DZD)", fee_h_EUR: "Euro (EUR)", fee_h_USD: "Dollar (USD)", cur_switch: "Changer de devise"
+  });
+  Object.assign(T.en, {
+    menu_cur: "Currencies and exchange rates", sec_cur: "Currencies", top_qty: "USDT quantity", top_sell: "Ideal sell price",
+    lbl_g: "Target profit ({gu})", lbl_a: "Purchase amount ({bu})", lbl_p: "Listed price ({bu}/USDT)",
+    lbl_sp: "Sell price ({su}/USDT)", lbl_ts: "Sell price ({tsu}/USDT)", lbl_ta: "Purchase amount ({tbu}) — optional",
+    lbl_bkf: "Transfer fee ({bu})", th_range: "Amount range ({dz})", th_amount: "Amount ({tbu})",
+    lbl_ebk: "Fixed transfer fee (€)", lbl_ubk: "Fixed transfer fee ($)",
+    lbl_reur: "Price of 1 € in dinars ({dz})", lbl_rusd: "Price of 1 $ in dinars ({dz})",
+    fee_h_DZD: "Dinar (DZD)", fee_h_EUR: "Euro (EUR)", fee_h_USD: "US dollar (USD)", cur_switch: "Change currency"
+  });
+  Object.assign(TIPS.ar, {
+    a: ["مبلغ الشراء", "المبلغ ({bu}) الذي ترسله لشراء USDT. اضغط رمز العملة بجانب الخانة لاختيار عملة أخرى من عملاتك. يُضاف إليه {fee}."],
+    p: ["السعر المعلن", "سعر الوحدة ({bu} لكل 1 USDT) في إعلان البائع. منه تُحسب الكمية: المبلغ ÷ السعر."],
+    g: ["الربح المطلوب", "الربح الذي تريده لكل 1 USDT بالعملة الأساسية ({gu}). يُحوَّل لباقي العملات بسعر الصرف ثم يُضاف إلى التكلفة."],
+    topQty: ["كمية USDT", "ما تملكه الآن من USDT (المخزون). كل شراء يزيدها وكل بيع ينقصها، وعند الصفر يبدأ الحساب من جديد."],
+    topSell: ["سعر البيع المثالي", "السعر الذي لا يجب أن تبيع تحته ليتحقق ربحك، محسوبًا على المخزون الحالي وبعملة هذه الخانة (برسومها). يتضمن العملية التي تكتبها قبل تسجيلها."],
+    sp: ["سعر البيع", "سعر بيع الوحدة بالعملة المختارة (اضغط رمز العملة لتغييرها). يظهر تلقائيًا السعر المثالي لهذه العملة، ويمكنك تغييره."],
+    ts: ["سعر البيع (للتحليل)", "أفضل سعر بيع معلن بالعملة المختارة. منه يُحسب أعلى سعر شراء يحقق ربحك."],
+    ta: ["مبلغ الشراء (اختياري)", "اكتب مبلغك بعملة الشراء المختارة لتعرف السعر المستهدف الخاص به. اتركه فارغًا لرؤية الجدول كاملًا."],
+    bkf: ["{Fee}", "رسم التحويل لهذه العملية ({bu}). يظهر تلقائيًا المبلغ الثابت من الإعدادات، ويمكنك كتابة قيمة أخرى. يدخل في حساب التكلفة."],
+    netq: ["الكمية الصافية المشتراة", "الكمية المشتراة (المبلغ ÷ السعر) بعد طرح رسوم الشراء. هذه هي الكمية التي تدخل مخزونك."],
+    curReal: ["التكلفة الفعلية لشراء الوحدة", "ما تكلّفك الوحدة فعليًا بعملة الشراء بعد رسوم الشراء ورسم التحويل ورسوم البيع بنفس العملة. هو أقل سعر بيع بدون ربح."],
+    cur: ["العملات", "اختر العملات التي تتداول بها. تظهر النتائج بكل عملة تختارها، وتحتاج سعر صرف لكل عملة غير الدينار."],
+    rEUR: ["سعر اليورو", "عدد الدنانير في 1 €. تُحوَّل به التكاليف والأرباح بين الدينار واليورو. عدّله عند الحاجة."],
+    rUSD: ["سعر الدولار", "عدد الدنانير في 1 $. تُحوَّل به التكاليف والأرباح بين الدينار والدولار."],
+    eb: ["رسوم الشراء (يورو)", "النسبة التي تخصمها المنصة من الكمية عند الشراء باليورو (0 افتراضيًا)."],
+    es: ["رسوم البيع (يورو)", "النسبة التي تخصمها المنصة عند البيع باليورو (0 افتراضيًا)."],
+    ebk: ["رسم التحويل (يورو)", "مبلغ ثابت يُضاف إلى كل شراء باليورو. اتركه 0 إن لم توجد رسوم."],
+    ub: ["رسوم الشراء (دولار)", "النسبة التي تخصمها المنصة من الكمية عند الشراء بالدولار."],
+    us: ["رسوم البيع (دولار)", "النسبة التي تخصمها المنصة عند البيع بالدولار."],
+    ubk: ["رسم التحويل (دولار)", "مبلغ ثابت يُضاف إلى كل شراء بالدولار. اتركه 0 إن لم توجد رسوم."],
+    sellProfit: ["ربح العملية", "الفرق بين مبلغ البيع (محوَّلًا إلى العملة الأساسية) وتكلفة الكمية المباعة على متوسط تكلفة المخزون."]
+  });
+  Object.assign(TIPS.fr, {
+    a: ["Montant d'achat", "Le montant ({bu}) que vous envoyez pour acheter des USDT. Touchez le symbole de devise à côté du champ pour choisir une autre de vos devises. Les {fee} s'y ajoutent."],
+    p: ["Prix annoncé", "Prix unitaire ({bu} pour 1 USDT) dans l'annonce du vendeur. La quantité s'en déduit : montant ÷ prix."],
+    g: ["Profit visé", "Le profit voulu par USDT dans la devise de base ({gu}). Il est converti vers les autres devises au taux de change, puis ajouté au coût."],
+    topQty: ["Quantité USDT", "Ce que vous détenez en USDT (stock). Chaque achat l'augmente, chaque vente la diminue, et à zéro le calcul repart de zéro."],
+    topSell: ["Prix de vente idéal", "Le prix sous lequel il ne faut pas vendre pour obtenir votre profit, calculé sur le stock actuel et dans la devise de cette case (avec ses frais). Il inclut l'opération en cours de saisie."],
+    sp: ["Prix de vente", "Prix de vente unitaire dans la devise choisie (touchez le symbole pour la changer). Le prix idéal de cette devise s'affiche automatiquement ; vous pouvez le modifier."],
+    ts: ["Prix de vente (analyse)", "La meilleure annonce de vente dans la devise choisie. On en déduit le prix d'achat maximal qui garantit votre profit."],
+    ta: ["Montant d'achat (facultatif)", "Saisissez votre montant dans la devise d'achat choisie pour obtenir son prix cible. Laissez vide pour voir tout le tableau."],
+    bkf: ["{Fee}", "Frais de virement pour cette opération ({bu}). Le montant fixe des paramètres s'affiche automatiquement ; vous pouvez saisir une autre valeur. Il entre dans le coût."],
+    netq: ["Quantité nette achetée", "La quantité achetée (montant ÷ prix) après les frais d'achat. C'est elle qui entre dans votre stock."],
+    curReal: ["Coût réel d'achat par unité", "Ce que coûte vraiment une unité dans la devise d'achat après les frais d'achat, de virement et de vente dans cette même devise. C'est le prix de vente minimum sans profit."],
+    cur: ["Devises", "Choisissez les devises avec lesquelles vous tradez. Les résultats s'affichent dans chaque devise choisie ; un taux de change est nécessaire pour chaque devise autre que le dinar."],
+    rEUR: ["Prix de l'euro", "Le nombre de dinars dans 1 €. Il sert à convertir coûts et profits entre dinar et euro. Modifiez-le au besoin."],
+    rUSD: ["Prix du dollar", "Le nombre de dinars dans 1 $. Il sert à convertir coûts et profits entre dinar et dollar."],
+    eb: ["Frais d'achat (euro)", "Pourcentage prélevé par la plateforme à l'achat en euros (0 par défaut)."],
+    es: ["Frais de vente (euro)", "Pourcentage prélevé par la plateforme à la vente en euros (0 par défaut)."],
+    ebk: ["Frais de virement (euro)", "Montant fixe ajouté à chaque achat en euros. Laissez 0 s'il n'y a pas de frais."],
+    ub: ["Frais d'achat (dollar)", "Pourcentage prélevé par la plateforme à l'achat en dollars."],
+    us: ["Frais de vente (dollar)", "Pourcentage prélevé par la plateforme à la vente en dollars."],
+    ubk: ["Frais de virement (dollar)", "Montant fixe ajouté à chaque achat en dollars. Laissez 0 s'il n'y a pas de frais."],
+    sellProfit: ["Profit de l'opération", "La différence entre le montant de la vente (converti dans la devise de base) et le coût de la quantité vendue au coût moyen du stock."]
+  });
+  Object.assign(TIPS.en, {
+    a: ["Purchase amount", "The amount ({bu}) you send to buy USDT. Tap the currency symbol next to the field to pick another of your currencies. The {fee} is added to it."],
+    p: ["Listed price", "Unit price ({bu} per 1 USDT) in the seller's listing. The quantity is worked out as amount ÷ price."],
+    g: ["Target profit", "The profit you want per 1 USDT in the base currency ({gu}). It is converted to the other currencies at the exchange rate, then added to the cost."],
+    topQty: ["USDT quantity", "What you hold in USDT (stock). Every purchase raises it and every sale lowers it; at zero the calculation starts afresh."],
+    topSell: ["Ideal sell price", "The price you should not sell below to reach your profit, based on current stock and in this cell's currency (with its fees). It includes the operation you are typing."],
+    sp: ["Sell price", "Unit sell price in the chosen currency (tap the symbol to change it). The ideal price for that currency appears automatically; you can change it."],
+    ts: ["Sell price (analysis)", "The best sell listing in the chosen currency. The highest buy price that secures your profit is worked out from it."],
+    ta: ["Purchase amount (optional)", "Type your amount in the chosen buy currency to get its target price. Leave empty to see the whole table."],
+    bkf: ["{Fee}", "Transfer fee for this operation ({bu}). The fixed amount from Settings appears automatically; you can type another value. It is part of the cost."],
+    netq: ["Net quantity bought", "The quantity bought (amount ÷ price) after the buy fee. This is what goes into your stock."],
+    curReal: ["Real purchase cost per unit", "What one unit really costs in the buy currency after buy, transfer and sell fees in that same currency. It is the minimum sell price with no profit."],
+    cur: ["Currencies", "Choose the currencies you trade in. Results are shown in each chosen currency; an exchange rate is needed for every currency other than the dinar."],
+    rEUR: ["Euro rate", "How many dinars in 1 €. Used to convert costs and profits between dinar and euro. Change it whenever needed."],
+    rUSD: ["Dollar rate", "How many dinars in 1 $. Used to convert costs and profits between dinar and dollar."],
+    eb: ["Buy fee (euro)", "Percentage the platform takes when buying in euros (0 by default)."],
+    es: ["Sell fee (euro)", "Percentage the platform takes when selling in euros (0 by default)."],
+    ebk: ["Transfer fee (euro)", "A fixed amount added to every euro purchase. Leave it at 0 if there is no fee."],
+    ub: ["Buy fee (dollar)", "Percentage the platform takes when buying in dollars."],
+    us: ["Sell fee (dollar)", "Percentage the platform takes when selling in dollars."],
+    ubk: ["Transfer fee (dollar)", "A fixed amount added to every dollar purchase. Leave it at 0 if there is no fee."],
+    sellProfit: ["Operation profit", "The difference between the sale amount (converted to the base currency) and the cost of the quantity sold at the stock's average cost."]
+  });
+  Object.assign(T.ar, { sw_fee: "احتساب رسوم بريدي موب في الحساب" });
+  Object.assign(T.fr, { sw_fee: "Inclure les frais Baridi Mob dans le calcul" });
+  Object.assign(T.en, { sw_fee: "Include Baridi Mob fee in the calculation" });
+  Object.assign(TIPS.ar, {
+    bm: ["رسوم بريدي موب", "عند التفعيل يُضاف رسم بريدي موب (حسب مجال المبلغ) إلى تكلفة الشراء بالدينار. أوقفه إن لم يكن يُخصم منك."],
+    topReal: ["متوسط التكلفة الفعلية", "متوسط تكلفة الوحدة في المخزون الحالي بالعملة الأساسية، مع رسوم بيعها."]
+  });
+  Object.assign(TIPS.fr, {
+    bm: ["Frais Baridi Mob", "Activé, les frais Baridi Mob (selon la tranche du montant) s'ajoutent au coût des achats en dinars. Désactivez-le s'ils ne vous sont pas facturés."],
+    topReal: ["Coût réel moyen", "Coût moyen par unité du stock actuel dans la devise de base, avec ses frais de vente."]
+  });
+  Object.assign(TIPS.en, {
+    bm: ["Baridi Mob fee", "When on, the Baridi Mob fee (by amount range) is added to the cost of dinar purchases. Turn it off if you are not charged."],
+    topReal: ["Average real cost", "Average cost per unit of the current stock in the base currency, including its sell fee."]
+  });
+
+  Object.assign(T.ar, { top_profit: "الربح الإجمالي", lbl_gD: "الربح المطلوب ({dz})", lbl_gE: "الربح المطلوب (€)", lbl_gU: "الربح المطلوب ($)" });
+  Object.assign(T.fr, { top_profit: "Profit total", lbl_gD: "Profit visé ({dz})", lbl_gE: "Profit visé (€)", lbl_gU: "Profit visé ($)" });
+  Object.assign(T.en, { top_profit: "Total profit", lbl_gD: "Target profit ({dz})", lbl_gE: "Target profit (€)", lbl_gU: "Target profit ($)" });
+  var GTIP = {
+    ar: ["الربح المطلوب", "الربح الذي تريده لكل 1 USDT بهذه العملة. يُضاف إلى تكلفة الوحدة (مع رسوم بيعها) فيعطيك سعر البيع المثالي لها."],
+    fr: ["Profit visé", "Le profit voulu par USDT dans cette devise. Il s'ajoute au coût unitaire (avec ses frais de vente) pour donner son prix de vente idéal."],
+    en: ["Target profit", "The profit you want per 1 USDT in this currency. It is added to the unit cost (with its sell fee) to give its ideal sell price."]
+  };
+  ["ar", "fr", "en"].forEach(function (L) { ["gDZD", "gEUR", "gUSD"].forEach(function (k) { TIPS[L][k] = GTIP[L]; }); });
+  Object.assign(TIPS.ar, { topProfit: ["الربح الإجمالي", "مجموع أرباح عمليات البيع المسجلة بعدد USDT (الربح بالدينار ÷ تكلفة الـ USDT وقت كل بيع)، ليكون التعبير محايدًا. والسطر الصغير تحته هو الربح نفسه بكل عملة بسعر الصرف الحالي."] });
+  Object.assign(TIPS.fr, { topProfit: ["Profit total", "Somme des profits des ventes enregistrées exprimée en USDT (profit en dinars ÷ coût de l'USDT au moment de chaque vente), pour rester neutre. La petite ligne dessous donne le même profit dans chaque devise au taux actuel."] });
+  Object.assign(TIPS.en, { topProfit: ["Total profit", "Sum of the profits of recorded sales expressed in USDT (profit in dinars ÷ cost of the USDT at each sale), to stay neutral. The small line below shows the same profit in each currency at the current rate."] });
+  Object.assign(T.ar, { nav_ops: "العمليات", nav_log: "السجل", nav_target: "السعر المستهدف" });
+  Object.assign(T.fr, { nav_ops: "Opérations", nav_log: "Journal", nav_target: "Prix cible" });
+  Object.assign(T.en, { nav_ops: "Operations", nav_log: "Log", nav_target: "Target price" });
+
+  /* ---------- العملات والرسوم ---------- */
+  var CUR = ["DZD", "EUR", "USD"];
+  var curs = ["DZD"], bcur = "DZD", scur = "DZD", tcb = "DZD", tcs = "DZD";
+  function sym(c) { return c === "EUR" ? "€" : c === "USD" ? "$" : (lang === "ar" ? "دج" : "DA"); }
+  function baseCur() { for (var i = 0; i < CUR.length; i++) if (curs.indexOf(CUR[i]) >= 0) return CUR[i]; return "DZD"; }
+  function feeName() { var k = bcur === "DZD" ? "fee_dz" : "fee_ot"; return (T[lang] && T[lang][k]) || T.ar[k]; }
+  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+  function fill(s) {
+    return s.replace(/\{Fee\}/g, cap(feeName())).replace(/\{fee\}/g, feeName())
+      .replace(/\{bu\}/g, sym(bcur)).replace(/\{su\}/g, sym(scur)).replace(/\{tbu\}/g, sym(tcb)).replace(/\{tsu\}/g, sym(tcs))
+      .replace(/\{gu\}/g, sym(baseCur())).replace(/\{dz\}/g, sym("DZD")).replace(/\{u\}/g, sym(baseCur()));
+  }
+  function t(key) {
+    var s = (T[lang] && T[lang][key]) || T.ar[key] || key, a = arguments;
+    s = s.replace(/\{(\d+)\}/g, function (m, i) { return a[+i + 1]; });
+    return fill(s);
+  }
+  function feeHead() { return bcur === "DZD" ? t("th_baridi") : cap(feeName()); }
+
+  /* ---------- أدوات ---------- */
+  function num(id) {
+    var v = $(id).value.replace(/[٠-٩]/g, function (d) { return "٠١٢٣٤٥٦٧٨٩".indexOf(d); })
+      .replace(/[٬\s]/g, "").replace("٫", ".").replace(",", ".");
+    var n = parseFloat(v); return isFinite(n) ? n : NaN;
+  }
+  function baridi(a) { return a <= 10000 ? 12 : a <= 20000 ? 15 : a <= 30000 ? 18 : a <= 40000 ? 21 : 24; }
+  function bf(fee) { return baridiOn ? fee : 0; }
+  function pcv(id) { var v = num(id); return (isNaN(v) || v < 0) ? 0 : v / 100; }
+  function rate(c) { return c === "DZD" ? 1 : num(c === "EUR" ? "rEUR" : "rUSD"); }      // دنانير لكل وحدة
+  function conv(x, from, to) {
+    if (from === to) return x;
+    var rf = rate(from), rt = rate(to);
+    return (rf > 0 && rt > 0) ? x * rf / rt : NaN;
+  }
+  function fc(c) {                                                                        // رسوم المنصة: شراء / بيع
+    if (c === "EUR") return { b: pcv("eb"), s: pcv("es") };
+    if (c === "USD") return { b: pcv("ub"), s: pcv("us") };
+    return { b: pcv("fb"), s: pcv("fs") };
+  }
+  function fixedSetting(c) { var v = num(c === "EUR" ? "ebk" : "ubk"); return (isNaN(v) || v < 0) ? 0 : v; }
+  // رسم تحويل عملية الشراء: بريدي موب تلقائي بالدينار، وخانة قابلة للتعديل بالعملات الأخرى
+  function buyFee(A) {
+    if (bcur === "DZD") return baridiOn ? baridi(A) : 0;
+    if (bfManual) { var v = num("bkf"); if (!isNaN(v) && v >= 0) return v; }
+    return fixedSetting(bcur);
+  }
+  function syncBuyFee() {
+    var el = $("bkf"), dz = bcur === "DZD";
+    $("bkfBox").hidden = dz;
+    el.classList.toggle("manual", bfManual && !dz);
+    if (dz || bfManual || document.activeElement === el) return;
+    el.value = fixedSetting(bcur).toFixed(2).replace(".", ",");
+  }
+  function dec(c) { return c === "DZD" ? 0 : 2; }          // خانات المبالغ
+  function pdec(c) { return c === "DZD" ? 2 : 3; }         // خانات الأسعار
+  function fmt(n, d) { return n.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d }); }
+  function sgn(n, d) { return (n >= 0 ? "+" : "") + fmt(n, d); }
+  function row(k, v, cls) { return '<div class="row"><dt>' + k + '</dt><dd' + (cls ? ' class="' + cls + '"' : "") + '>' + v + '</dd></div>'; }
+  function setVal(id, text) {
+    var el = $(id);
+    if (el.textContent === text) return;
+    el.textContent = text;
+    el.classList.remove("bump"); void el.offsetWidth; el.classList.add("bump");
+  }
+  function animateIn(el) { el.classList.remove("page-in"); void el.offsetWidth; el.classList.add("page-in"); }
+  var toastTimer = null;
+  function toast(msg) {
+    var tt = $("toast");
+    tt.textContent = msg; tt.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { tt.classList.remove("show"); }, 1700);
+    try { if (navigator.vibrate) navigator.vibrate(15); } catch (e) {}
+  }
+  var lastAdded = null;
+  function nowTime() { var d = new Date(); return ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2); }
+
+  /* ---------- المخزون: كمية USDT وتكلفتها (متوسط متحرك) ---------- */
+  // كل شراء يضيف كمية وتكلفة، وكل بيع ينقص الكمية بنفس متوسط التكلفة. عند الصفر يبدأ الحساب من جديد.
+  var QEPS = 0.0005;                       // تقريب الكمية إلى 4 خانات عشرية: ما دونه يُعدّ صفرًا
+  function inventory(withPending) {
+    var S = 0, C = 0;
+    ops.forEach(function (o) {
+      if (o.type === "buy") { if (o.inc) { S += o.H; C += o.costB; } }
+      else if (o.type === "sell") {
+        if (S > 1e-9) { var take = o.q >= S - QEPS ? S : o.q; C -= C * (take / S); S -= take; }
+        if (S < QEPS) { S = 0; C = 0; }
+      }
+    });
+    if (withPending && last) { S += last.H; C += last.costB; }
+    return { S: S, C: C, avg: S > 0 ? C / S : null };
+  }
+  // الربح المطلوب لكل 1 USDT بعملة c (خانة مستقلة لكل عملة)
+  function gOf(c) { var v = num("g" + c); return isNaN(v) ? 0 : v; }
+  // سعر البيع المثالي بعملة c = متوسط التكلفة (محوَّلًا إلى c) ÷ (1 - رسوم بيع c) + ربح c
+  function idealPrice(avgB, c) {
+    var s = fc(c).s, avgC = conv(avgB, baseCur(), c);
+    if (!isFinite(avgC) || avgC < 0 || s >= 1) return NaN;
+    var v = avgC / (1 - s) + gOf(c);
+    var m = Math.pow(10, pdec(c));
+    return Math.ceil(v * m - 1e-9) / m;       // يُقرَّب للأعلى حتى لا ينقص الربح عن المطلوب
+  }
+  // الربح الإجمالي: بعدد USDT (الربح بالدينار ÷ تكلفة الـ USDT وقت كل بيع)، ومعه تقديره بكل عملة
+  function totals() {
+    var base = baseCur(), usdt = 0, pb = 0, has = false, per = {};
+    ops.forEach(function (o) {
+      if (o.type === "sell" && o.profit !== null && o.profit !== undefined) {
+        has = true; pb += o.profit;
+        var avg = o.q > 0 ? o.costB / o.q : 0;
+        if (avg > 0) usdt += o.profit / avg;
+      }
+    });
+    curs.forEach(function (c) { per[c] = conv(pb, base, c); });
+    return { has: has, usdt: usdt, base: pb, per: per };
+  }
+  function profitSub(tt) {
+    return "≈ " + curs.map(function (c) { return isFinite(tt.per[c]) ? sgn(tt.per[c], dec(c)) + " " + sym(c) : "—"; }).join(" · ");
+  }
+  function updateTop() {
+    var inv = inventory(true), tt = totals();
+    $("topbar").setAttribute("data-n", String(curs.length));
+    setVal("topQ", fmt(inv.S, 2));
+    setVal("topProfit", tt.has ? sgn(tt.usdt, 2) : "—");
+    $("topProfitSub").textContent = tt.has ? profitSub(tt) : "";
+    var cell = $("cTot");
+    cell.classList.remove("c3", "c4", "c5");
+    cell.classList.add(!tt.has ? "c3" : tt.base >= 0 ? "c4" : "c5");
+    CUR.forEach(function (c) {
+      var box = $("col_" + c);
+      box.hidden = curs.indexOf(c) < 0;
+      if (box.hidden) return;
+      var v = inv.avg !== null ? idealPrice(inv.avg, c) : NaN;
+      setVal("topP_" + c, isFinite(v) ? fmt(v, pdec(c)) : "—");
+    });
+  }
+
+  /* ---------- صفحة الشراء ---------- */
+  function calc() {
+    var A = num("a"), P = num("p");
+    if (isNaN(A) || isNaN(P) || A <= 0 || P <= 0) {
+      last = null;
+      setVal("curReal", "—"); setVal("netQ", "—");
+      updateTop();
+      $("save").disabled = true;
+      return;
+    }
+    var f = fc(bcur), F = buyFee(A), Q = A / P, H = Q * (1 - f.b);
+    var k = conv(1, bcur, baseCur()), costB = (A + F) * k;
+    var real = (A + F) / (H * (1 - f.s));
+    var ok = isFinite(costB) && isFinite(real) && H > 0;
+    last = ok ? { cur: bcur, A: A, P: P, F: F, fbr: f.b, Q: Q, H: H, k: k, costB: costB, real: real } : null;
+    setVal("curReal", isFinite(real) ? fmt(real, pdec(bcur)) : "—");
+    setVal("netQ", H > 0 ? fmt(H, 4) : "—");
+    updateTop();
+    $("save").disabled = !last;
+  }
+  function recalcAll() { syncBuyFee(); calc(); refreshSell(); calcTarget(); }
+  ["a", "p"].forEach(function (id) { $(id).addEventListener("input", calc); });
+  ["fb", "fs", "eb", "es", "ebk", "ub", "us", "ubk", "rEUR", "rUSD"].forEach(function (id) { $(id).addEventListener("input", recalcAll); });
+  ["gDZD", "gEUR", "gUSD"].forEach(function (id) {
+    $(id).addEventListener("input", function () { calc(); refreshSell(); calcTarget(); persist(); });
+  });
+  $("bkf").addEventListener("input", function () { bfManual = this.value.trim() !== ""; syncBuyFee(); calc(); });
+  $("bkf").addEventListener("blur", function () { syncBuyFee(); calc(); });
+
+  $("save").addEventListener("click", function () {
+    if (!last) return;
+    var o = { type: "buy", n: ++counter, t: nowTime(), inc: true };
+    for (var k in last) o[k] = last[k];
+    ops.push(o);
+    lastAdded = o.n;
+    toast(t("toast_buy"));
+    $("a").value = ""; $("p").value = "";
+    bfManual = false; syncBuyFee();
+    calc();
+    renderLog();
+  });
+
+  /* ---------- صفحة البيع ---------- */
+  function setSellField(key, val, digits) {
+    var el = $(key);
+    el.classList.toggle("manual", sManual[key]);
+    if (sManual[key] || document.activeElement === el) return;
+    el.value = val === null ? "" : val.toFixed(digits).replace(".", ",");
+  }
+  function refreshSell() {
+    var inv = inventory(false), c = scur, base = baseCur();
+    setSellField("sq", inv.S > 0 ? inv.S : null, 4);
+    var ip = inv.avg !== null ? idealPrice(inv.avg, c) : NaN;
+    setSellField("sp", isFinite(ip) ? ip : null, pdec(c));
+    $("sAmtU").textContent = sym(c); $("sProfU").textContent = sym(base);
+    var q = num("sq"), p = num("sp"), pc = $("sProfitCell");
+    pc.classList.remove("gain", "loss");
+    if (isNaN(q) || isNaN(p) || q <= 0 || p <= 0 || q > inv.S + QEPS) {
+      setVal("sAmt", "—"); setVal("sProfit", "—"); $("ssave").disabled = true; return;
+    }
+    q = Math.min(q, inv.S);
+    var rev = q * p * (1 - fc(c).s), revB = conv(rev, c, base);
+    setVal("sAmt", fmt(rev, dec(c)));
+    if (inv.avg !== null && isFinite(revB)) {
+      var profit = revB - q * inv.avg;
+      setVal("sProfit", sgn(profit, 2));
+      pc.classList.add(profit >= 0 ? "gain" : "loss");
+      $("ssave").disabled = false;
+    } else { setVal("sProfit", "—"); $("ssave").disabled = true; }
+  }
+  ["sq", "sp"].forEach(function (k) {
+    var el = $(k);
+    el.addEventListener("input", function () { sManual[k] = el.value.trim() !== ""; refreshSell(); });
+    el.addEventListener("blur", refreshSell);
+  });
+  $("ssave").addEventListener("click", function () {
+    var inv = inventory(false), q = num("sq"), p = num("sp"), c = scur, base = baseCur();
+    if (isNaN(q) || isNaN(p) || q <= 0 || p <= 0 || inv.avg === null || q > inv.S + QEPS) return;
+    q = Math.min(q, inv.S);
+    var s = fc(c).s, rev = q * p * (1 - s), revB = conv(rev, c, base);
+    if (!isFinite(revB)) return;
+    var costB = q * inv.avg;
+    ops.push({ type: "sell", n: ++counter, t: nowTime(), cur: c, q: q, p: p, s: s, rev: rev, revB: revB, costB: costB, profit: revB - costB });
+    lastAdded = counter;
+    toast(t("toast_sell"));
+    sManual.sq = sManual.sp = false;
+    $("sq").value = ""; $("sp").value = "";
+    renderLog();
+  });
+
+  /* ---------- السجل المشترك ---------- */
+  function suf(c) { return curs.length > 1 ? " " + sym(c || "DZD") : ""; }
+  function headCells() { return ["#", t("c_type"), t("c_time"), t("c_amount"), t("c_price"), t("c_net"), t("c_profit")]; }
+  function cells(o) {
+    var c = o.cur || "DZD";
+    if (o.type === "buy")
+      return [o.n, t("buy"), o.t, fmt(o.A, dec(c)) + suf(c), fmt(o.real, pdec(c)) + suf(c), fmt(o.H, 4), "-"];
+    return [o.n, t("sell"), o.t, fmt(o.rev, dec(c)) + suf(c), fmt(o.p, pdec(c)) + suf(c), fmt(o.q, 4),
+      (o.profit === null || o.profit === undefined) ? "-" : sgn(o.profit, 0) + suf(baseCur())];
+  }
+  function copyHead() {
+    return ["#", t("c_type"), t("c_time"), t("c_amount"), t("c_listed"), t("c_bought"), t("c_afterbuy"), t("c_net"), feeHead(), t("c_price"), t("c_profit")];
+  }
+  function copyCells(o) {
+    var c = o.cur || "DZD";
+    if (o.type === "buy")
+      return [o.n, t("buy"), o.t, fmt(o.A, dec(c)) + " " + c, fmt(o.P, pdec(c)), fmt(o.Q, 4), fmt(o.H, 4), fmt(o.H, 4), fmt(o.F, 2), fmt(o.real, pdec(c)), "-"];
+    return [o.n, t("sell"), o.t, fmt(o.rev, dec(c)) + " " + c, fmt(o.p, pdec(c)), "-", "-", fmt(o.q, 4), "-",
+      fmt(o.p, pdec(c)), (o.profit === null || o.profit === undefined) ? "-" : fmt(o.profit, 0)];
+  }
+
+  function renderSummary() {
+    var box = $("sum"), inv = inventory(false), base = baseCur(), tt = totals();
+    updateTop();
+    if (!ops.length) { box.innerHTML = ""; return; }
+    function cell(cls, name, val, unitTxt, key, sub) {
+      return '<div class="cell ' + cls + '"><div class="name">' + name + '<button type="button" class="info" data-tip="' + key + '" aria-label="' + t("explain") + '">!</button></div><div class="val">' + val +
+        (unitTxt ? ' <span class="unit">' + unitTxt + '</span>' : "") + (sub ? '<div class="subv">' + sub + '</div>' : "") + "</div></div>";
+    }
+    var avgReal = inv.avg !== null ? inv.avg / (1 - fc(base).s) : null;
+    box.innerHTML = '<div class="cells">' +
+      cell("c3", t("top_real"), avgReal !== null && isFinite(avgReal) ? fmt(avgReal, pdec(base)) : "—", sym(base), "topReal") +
+      cell(!tt.has ? "c3" : tt.base >= 0 ? "c4" : "c5", t("top_profit"), tt.has ? sgn(tt.usdt, 2) : "—", "USDT", "topProfit", tt.has ? profitSub(tt) : "") +
+      "</div>";
+  }
+
+  /* ---------- الحفظ والاسترجاع ---------- */
+  var STORE_KEY = "p2p-usdt-v1";
+  var FIELDS = ["gDZD", "gEUR", "gUSD", "fb", "fs", "eb", "es", "ebk", "ub", "us", "ubk", "rEUR", "rUSD"];
+  function persist() {
+    try {
+      var d = { ops: ops, counter: counter, bm: baridiOn, lang: lang, curs: curs, bcur: bcur, scur: scur, tcb: tcb, tcs: tcs };
+      FIELDS.forEach(function (id) { d["f_" + id] = $(id).value; });
+      localStorage.setItem(STORE_KEY, JSON.stringify(d));
+    } catch (e) {}
+  }
+  function migrate(o) {                       // سجلات النسخ القديمة (دينار فقط)
+    if (o.type === "buy" && o.H === undefined) {
+      o.cur = o.cur || "DZD";
+      o.H = o.Q2 !== undefined ? o.Q2 : (o.Q1 !== undefined ? o.Q1 : o.Q);
+      o.costB = o.A + (o.F || 0); o.k = 1; o.fbr = o.fbr || 0;
+    } else if (o.type === "sell" && o.cur === undefined) {
+      o.cur = "DZD"; o.costB = o.cost; o.revB = o.rev;
+    }
+    return o;
+  }
+  function restore() {
+    try {
+      var d = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
+      if (!d) return;
+      ops = (d.ops || []).map(migrate); counter = d.counter || 0;
+      FIELDS.forEach(function (id) {
+        var v = d["f_" + id]; if (v === undefined) v = d[id];
+        if (v !== undefined && v !== null) $(id).value = v;
+      });
+      if (d.f_gDZD === undefined) { var og = d.f_g !== undefined ? d.f_g : d.g; if (og !== undefined) $("gDZD").value = og; }
+      baridiOn = d.bm !== false;
+      if (d.lang && T[d.lang]) lang = d.lang;
+      if (d.curs && d.curs.length) curs = CUR.filter(function (c) { return d.curs.indexOf(c) >= 0; });
+      if (!curs.length) curs = ["DZD"];
+      if (d.bcur) bcur = d.bcur; if (d.scur) scur = d.scur; if (d.tcb) tcb = d.tcb; if (d.tcs) tcs = d.tcs;
+    } catch (e) {}
+  }
+
+  function renderLog() {
+    persist();
+    $("copy").hidden = $("clear").hidden = ops.length === 0;
+    renderSummary();
+    refreshSell();
+    var box = $("log");
+    if (!ops.length) { box.innerHTML = '<p class="empty">' + t("empty_log") + '</p>'; return; }
+    var h = '<div class="scroll"><table><thead><tr><th>' + t("th_inc") + '</th>';
+    headCells().forEach(function (x) { h += "<th>" + x + "</th>"; });
+    h += "<th></th></tr></thead><tbody>";
+    ops.forEach(function (o, i) {
+      var c = cells(o), isBuy = o.type === "buy";
+      var trc = (isBuy && !o.inc ? "off " : "") + (o.n === lastAdded ? "new" : "");
+      h += "<tr" + (trc ? ' class="' + trc.trim() + '"' : "") + "><td>" +
+        (isBuy ? '<input type="checkbox" class="inc" data-i="' + i + '"' + (o.inc ? " checked" : "") + ' aria-label="' + t("inc_aria") + '">' : "") + "</td>";
+      c.forEach(function (v, j) {
+        if (j === 1) h += '<td><span class="tag ' + (isBuy ? "buy" : "sell") + '">' + v + "</span></td>";
+        else {
+          var cls = "n";
+          if (j === 4 || j === 6) cls += " key";
+          if (j === 6 && !isBuy && o.profit !== null && o.profit !== undefined) cls += o.profit >= 0 ? " gain" : " loss";
+          h += '<td class="' + cls + '">' + v + "</td>";
+        }
+      });
+      h += '<td><button class="x" data-i="' + i + '" aria-label="' + t("del_row") + '">✕</button></td></tr>';
+    });
+    box.innerHTML = h + "</tbody></table></div>";
+    lastAdded = null;
+  }
+
+  $("log").addEventListener("change", function (e) {
+    var c = e.target.closest(".inc"); if (!c) return;
+    ops[parseInt(c.getAttribute("data-i"), 10)].inc = c.checked;
+    renderLog();
+  });
+  $("log").addEventListener("click", function (e) {
+    var b = e.target.closest(".x"); if (!b) return;
+    ops.splice(parseInt(b.getAttribute("data-i"), 10), 1);
+    renderLog();
+  });
+  $("clear").addEventListener("click", function () {
+    if (ops.length && confirm(t("confirm_clear"))) { ops = []; counter = 0; renderLog(); }
+  });
+  $("copy").addEventListener("click", function () {
+    var lines = [copyHead().join("\t")];
+    ops.forEach(function (o) { lines.push(copyCells(o).join("\t")); });
+    var text = lines.join("\n"), btn = $("copy");
+    copyText(text, function (ok) {
+      btn.textContent = ok ? t("copied") : t("copy_fail");
+      setTimeout(function () { btn.textContent = t("copy"); }, 1600);
+    });
+  });
+
+  /* ---------- نسخ القيم ---------- */
+  var COPY_ICON = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>';
+  var CHECK_ICON = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>';
+  function copyText(text, cb) {
+    function done(ok) { if (cb) cb(ok); }
+    function fallback() {
+      var ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select();
+      var ok = false; try { ok = document.execCommand("copy"); } catch (e2) {}
+      document.body.removeChild(ta); done(ok);
+    }
+    try { navigator.clipboard.writeText(text).then(function () { done(true); }, fallback); } catch (e) { fallback(); }
+  }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest(".copy-btn"); if (!b) return;
+    var v = b.getAttribute("data-v");
+    if (v === null) v = $(b.getAttribute("data-src")).textContent;
+    v = (v || "").replace(/,/g, "").trim();
+    if (!v || v === "—") return;
+    copyText(v, function (ok) {
+      if (!ok) { toast(t("copy_fail")); return; }
+      b.innerHTML = CHECK_ICON;
+      setTimeout(function () { b.innerHTML = COPY_ICON; }, 1200);
+      toast(t("copied"));
+    });
+  });
+
+  /* ---------- اختيار العملة بجانب الخانة ---------- */
+  var CTX = { a: "buy", sp: "sell", ts: "tsell", ta: "tbuy" };
+  var PRICEF = { p: "buy", sp: "sell", ts: "tsell" };
+  function getCtx(k) { return k === "buy" ? bcur : k === "sell" ? scur : k === "tsell" ? tcs : tcb; }
+  function setCtx(k, c) { if (k === "buy") bcur = c; else if (k === "sell") scur = c; else if (k === "tsell") tcs = c; else tcb = c; }
+  function fixSel() {
+    var b = baseCur();
+    if (curs.indexOf(bcur) < 0) bcur = b;
+    if (curs.indexOf(scur) < 0) scur = b;
+    if (curs.indexOf(tcb) < 0) tcb = b;
+    if (curs.indexOf(tcs) < 0) tcs = b;
+  }
+  function updateCurUI() {
+    Array.prototype.forEach.call(document.querySelectorAll(".curbtn"), function (b) {
+      b.textContent = sym(getCtx(b.getAttribute("data-ctx"))) + "▾";
+      b.hidden = curs.length < 2;
+      b.setAttribute("aria-label", t("cur_switch"));
+    });
+  }
+  function refreshTexts() {
+    Array.prototype.forEach.call(document.querySelectorAll("[data-i18n]"), function (el) {
+      el.textContent = t(el.getAttribute("data-i18n"));
+    });
+    Array.prototype.forEach.call(document.querySelectorAll("[data-cursym]"), function (el) {
+      el.textContent = sym(el.getAttribute("data-cursym"));
+    });
+    $("curRealU").textContent = sym(bcur); $("sAmtU").textContent = sym(scur);
+    $("sProfU").textContent = sym(baseCur()); $("tU").textContent = sym(tcb);
+    updateCurUI();
+  }
+  function cycleCur(k) {
+    var i = curs.indexOf(getCtx(k));
+    setCtx(k, curs[(i + 1) % curs.length]);
+    if (k === "buy") bfManual = false;
+    if (k === "sell") sManual.sp = false;
+    refreshTexts(); syncBuyFee(); calc(); refreshSell(); calcTarget(); persist();
+  }
+
+  /* ---------- أزرار الزيادة والإنقاص ---------- */
+  var STEPS = { a: 0.01, p: 0.01, gDZD: 0.01, gEUR: 0.001, gUSD: 0.001, fb: 0.1, fs: 0.1, eb: 0.1, es: 0.1, ebk: 0.01, ub: 0.1, us: 0.1, ubk: 0.01,
+    rEUR: 0.1, rUSD: 0.1, sq: 0.01, sp: 0.01, ts: 0.01, ta: 0.01, bkf: 0.01 };
+  var DEC = { a: 2, p: 2, gDZD: 2, gEUR: 3, gUSD: 3, fb: 1, fs: 1, eb: 1, es: 1, ebk: 2, ub: 1, us: 1, ubk: 2, rEUR: 2, rUSD: 2, sq: 2, sp: 2, ts: 2, ta: 2, bkf: 2 };
+  function stepInfo(id) {
+    var st = STEPS[id], d = DEC[id];
+    if (PRICEF[id] && getCtx(PRICEF[id]) !== "DZD") { st = 0.001; d = 3; }
+    return { st: st, d: d };
+  }
+  function stepField(id, dir) {
+    var el = $(id), cur = num(id), si = stepInfo(id);
+    if (isNaN(cur)) cur = 0;
+    var v = Math.max(0, Math.round((cur + dir * si.st) * 1e4) / 1e4);
+    el.value = v.toFixed(si.d).replace(".", ",");
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+  Object.keys(STEPS).forEach(function (id) {
+    var el = $(id), wrap = document.createElement("div");
+    wrap.className = "stepper";
+    el.parentNode.insertBefore(wrap, el);
+    function mk(up) {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "stp"; b.textContent = up ? "▲" : "▼";
+      b.setAttribute("data-dir", up ? "up" : "down");
+      var dir = up ? 1 : -1, t1 = null, t2 = null;
+      function stop() { clearTimeout(t1); clearInterval(t2); }
+      b.addEventListener("pointerdown", function (e) {
+        e.preventDefault();
+        stepField(id, dir);
+        t1 = setTimeout(function () { t2 = setInterval(function () { stepField(id, dir); }, 90); }, 450);
+      });
+      ["pointerup", "pointerleave", "pointercancel"].forEach(function (ev) { b.addEventListener(ev, stop); });
+      b.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+      b.addEventListener("click", function (e) { if (e.detail === 0) stepField(id, dir); });
+      return b;
+    }
+    var col = document.createElement("div");
+    col.className = "stp-col";
+    col.appendChild(mk(true));
+    col.appendChild(mk(false));
+    wrap.appendChild(col);
+    wrap.appendChild(el);
+    if (CTX[id]) {
+      var cb = document.createElement("button");
+      cb.type = "button"; cb.className = "curbtn"; cb.setAttribute("data-ctx", CTX[id]);
+      cb.addEventListener("click", function () { cycleCur(CTX[id]); });
+      wrap.appendChild(cb);
+    }
+  });
+
+  /* ---------- سعر الشراء المستهدف ---------- */
+  var BR = [
+    { fee: 12, lo: 0,     hi: 10000,    low: 5000,  high: 10000 },
+    { fee: 15, lo: 10001, hi: 20000,    low: 10001, high: 20000 },
+    { fee: 18, lo: 20001, hi: 30000,    low: 20001, high: 30000 },
+    { fee: 21, lo: 30001, hi: 40000,    low: 30001, high: 40000 },
+    { fee: 24, lo: 40001, hi: Infinity, low: 40001, high: 100000 }
+  ];
+  var REF = [100, 500, 1000, 5000, 10000];
+  function rangeLabel(b) { return b.hi === Infinity ? fmt(b.lo, 0) + " " + t("and_above") : fmt(b.lo, 0) + " – " + fmt(b.hi, 0); }
+  function floor2(x) { return Math.floor(x * 100 + 1e-9) / 100; }
+  function floor3(x) { return Math.floor(x * 1000 + 1e-9) / 1000; }
+
+  function renderBmTable() {
+    var h = "";
+    BR.forEach(function (b) { h += "<tr><td>" + rangeLabel(b) + "</td><td>" + b.fee + " " + sym("DZD") + "</td></tr>"; });
+    $("bmBody").innerHTML = h;
+  }
+
+  function setTarget(v) {
+    setVal("tVal", v === null ? "—" : fmt(v, pdec(tcb)));
+    $("tCopy").setAttribute("data-v", v === null ? "" : v.toFixed(pdec(tcb)));
+  }
+  function calcTarget() {
+    var S = num("ts"), A = num("ta"), g = gOf(tcs), out = $("tout"), base = baseCur();
+    $("tU").textContent = sym(tcb);
+    if (isNaN(S) || S <= 0) { out.innerHTML = ""; setTarget(null); return; }
+    var Sb = conv(S, tcs, base), gB = conv(g, tcs, base), kb = conv(1, tcb, base), ss = fc(tcs).s, fb = fc(tcb).b;
+    if (!isFinite(Sb) || !isFinite(gB) || !isFinite(kb)) { out.innerHTML = ""; setTarget(null); return; }
+    var fl = tcb === "DZD" ? floor2 : floor3;
+    // أعلى سعر شراء (بعملة الشراء) يحقق الربح عند البيع بسعر S: التكلفة المسموحة للوحدة = (S - الربح) × (1 - رسوم البيع)
+    function tpf(Amt, F) { return fl((Sb - gB) * (1 - ss) * (1 - fb) / (kb * (1 + F / Amt))); }
+    var html = "", hasA = !isNaN(A) && A > 0, tp = null, pd = pdec(tcb);
+    if (tcb === "DZD") {
+      var cur = -1;
+      if (hasA) {
+        for (var i = 0; i < BR.length; i++) { if (A <= BR[i].hi) { cur = i; break; } }
+        tp = tpf(A, bf(BR[cur].fee));
+      }
+      html += '<div class="panel"><div class="scroll"><table><thead><tr><th>' + t("th_range") + '</th><th>' + t("th_fee_short") + '</th>' +
+        '<th>' + t("th_low") + '</th><th>' + t("th_high") + '</th></tr></thead><tbody>';
+      BR.forEach(function (b, i) {
+        html += '<tr' + (i === cur ? ' class="cur"' : "") + '><td>' + rangeLabel(b) + '</td><td class="n">' + bf(b.fee) + '</td>' +
+          '<td class="n key">' + fmt(tpf(b.low, bf(b.fee)), pd) + '<span class="sub">' + fmt(b.low, 0) + '</span></td>' +
+          '<td class="n key">' + fmt(tpf(b.high, bf(b.fee)), pd) + '<span class="sub">' + fmt(b.high, 0) + '</span></td></tr>';
+      });
+      html += '</tbody></table></div></div>';
+    } else {
+      var fx = fixedSetting(tcb);
+      if (hasA) tp = tpf(A, fx);
+      html += '<div class="panel"><div class="scroll"><table><thead><tr><th>' + t("th_amount") + '</th><th>' + t("th_fee_short") + '</th>' +
+        '<th>' + t("th_target") + '</th></tr></thead><tbody>';
+      REF.forEach(function (r) {
+        html += '<tr><td class="n">' + fmt(r, 0) + '</td><td class="n">' + fmt(fx, 2) + '</td><td class="n key">' + fmt(tpf(r, fx), pd) + '</td></tr>';
+      });
+      html += '</tbody></table></div></div>';
+    }
+    out.innerHTML = html;
+    setTarget(tp);
+  }
+  ["ts", "ta"].forEach(function (id) { $(id).addEventListener("input", calcTarget); });
+
+  /* ---------- التبويبات ---------- */
+  var PAGES = { buy: ["pageBuy", "tabBuy", "ftabBuy"], sell: ["pageSell", "tabSell", "ftabSell"] };
+  var ORDER = ["buy", "sell"];
+  var swapTimer = null, swapOut = null, swapIn = null;
+  function finishSwap() {
+    clearTimeout(swapTimer); swapTimer = null;
+    if (swapOut) { swapOut.hidden = true; swapOut.classList.remove("going"); swapOut = null; }
+    if (swapIn) { swapIn.classList.remove("coming"); swapIn = null; }
+  }
+  function showPage(name) {
+    finishSwap();
+    var cur = null;
+    ORDER.forEach(function (k) { if (!$(PAGES[k][0]).hidden) cur = k; });
+    ORDER.forEach(function (k) {
+      var on = k === name;
+      $(PAGES[k][1]).setAttribute("aria-selected", on);
+      $(PAGES[k][2]).classList.toggle("active", on);
+    });
+    var inn = $(PAGES[name][0]);
+    if (cur && cur !== name) {
+      var out = $(PAGES[cur][0]);
+      if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        out.hidden = true; inn.hidden = false;
+      } else {
+        // الصفحة الجديدة تصعد إلى الواجهة، والسابقة تنزل خلفها كملف مغطّى
+        inn.hidden = false;
+        out.classList.add("going"); inn.classList.add("coming");
+        swapOut = out; swapIn = inn;
+        swapTimer = setTimeout(finishSwap, 420);
+      }
+    } else { inn.hidden = false; }
+    if (name === "sell") refreshSell();
+  }
+  $("tabBuy").addEventListener("click", function () { showPage("buy"); });
+  $("tabSell").addEventListener("click", function () { showPage("sell"); });
+
+  /* ---------- الصفحات الرئيسية: العمليات / السجل / السعر المستهدف ---------- */
+  var VIEWS = { ops: ["viewOps", "navOps"], log: ["viewLog", "navLog"], target: ["viewTarget", "navTarget"] };
+  function showView(name) {
+    hideTip(); closeMenu();
+    Object.keys(VIEWS).forEach(function (k) {
+      var on = k === name;
+      $(VIEWS[k][0]).hidden = !on;
+      $(VIEWS[k][1]).setAttribute("aria-selected", on);
+    });
+    $("topbar").hidden = name === "log";
+    animateIn($(VIEWS[name][0]));
+    if (window.scrollTo) window.scrollTo(0, 0);
+    if (name === "target") calcTarget();
+    if (name === "ops") refreshSell();
+  }
+  Object.keys(VIEWS).forEach(function (k) {
+    $(VIEWS[k][1]).addEventListener("click", function () { showView(k); });
+  });
+
+  /* ---------- أيقونات الشرح (!) ---------- */
+  function mkInfo(key) {
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "info"; b.setAttribute("data-tip", key);
+    b.setAttribute("aria-label", "شرح"); b.textContent = "!";
+    return b;
+  }
+  function addInfo(el, key) {
+    if (!el) return;
+    el.appendChild(mkInfo(key));
+  }
+  ["a", "p", "gDZD", "gEUR", "gUSD", "sq", "sp", "ts", "ta", "fb", "fs", "eb", "es", "ebk", "ub", "us", "ubk", "rEUR", "rUSD", "bkf"].forEach(function (id) {
+    addInfo(document.querySelector('label[for="' + id + '"]'), id);
+  });
+  addInfo($("netqLabel"), "netq");
+  addInfo($("sAmtName"), "sellAmt");
+  addInfo($("sProfitName"), "sellProfit");
+  addInfo($("tName"), "tRes");
+  addInfo($("qtyName"), "topQty");
+  addInfo($("totName"), "topProfit");
+  Array.prototype.forEach.call(document.querySelectorAll(".pname"), function (n) { addInfo(n, "topSell"); });
+  addInfo(document.querySelector(".res.a .name"), "curReal");
+  addInfo(document.querySelector("label.switch"), "bm");
+  (function () {
+    var btn = $("settingsBtn"), w = document.createElement("div");
+    w.className = "headact";
+    btn.parentNode.insertBefore(w, btn);
+    w.appendChild(btn);
+    w.appendChild(mkInfo("settings"));
+  })();
+  ["tabBuy", "tabSell"].forEach(function (id) { $(id).parentNode.appendChild(mkInfo(id)); });
+
+  var tipBtn = null;
+  function hideTip() {
+    $("tip").hidden = true;
+    if (tipBtn) { tipBtn.setAttribute("aria-expanded", "false"); tipBtn = null; }
+  }
+  function showTip(btn) {
+    var d = (TIPS[lang] || TIPS.ar)[btn.getAttribute("data-tip")]; if (!d) return;
+    var tip = $("tip");
+    tip.querySelector(".tt").textContent = fill(d[0]);
+    tip.querySelector(".td").textContent = fill(d[1]);
+    tip.hidden = false;
+    var r = btn.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
+    var left = Math.min(Math.max(12, r.left + r.width / 2 - w / 2), window.innerWidth - w - 12);
+    var top = r.bottom + 10;
+    if (top + h > window.innerHeight - 10) top = Math.max(10, r.top - h - 10);
+    tip.style.left = left + "px"; tip.style.top = top + "px";
+    tipBtn = btn; btn.setAttribute("aria-expanded", "true");
+  }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest(".info");
+    if (b) {
+      e.preventDefault();           // لا تفعّل الخانة أو المفتاح المرتبط بالعنوان
+      if (tipBtn === b) hideTip(); else { hideTip(); showTip(b); }
+      return;
+    }
+    if (!e.target.closest("#tip")) hideTip();
+  });
+  window.addEventListener("scroll", hideTip, { passive: true });
+  window.addEventListener("resize", hideTip);
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Escape") return;
+    hideTip();
+    if (!$("settingsPage").hidden) cancelSettings(); else closeMenu();
+  });
+
+  /* ---------- الإعدادات ---------- */
+  function segUI(id, val) {
+    Array.prototype.forEach.call($(id).querySelectorAll("button"), function (b) {
+      b.setAttribute("aria-pressed", b.getAttribute("data-v") === val);
+    });
+  }
+  /* --- القائمة المنسدلة --- */
+  function closeMenu() {
+    $("settingsMenu").hidden = true;
+    $("settingsBtn").setAttribute("aria-expanded", "false");
+  }
+  $("settingsBtn").addEventListener("click", function () {
+    var m = $("settingsMenu"), open = m.hidden;
+    hideTip();
+    m.hidden = !open;
+    this.setAttribute("aria-expanded", open);
+    if (open) animateIn(m);
+  });
+  document.addEventListener("click", function (e) {
+    if (!$("settingsMenu").hidden && !e.target.closest("#settingsMenu") && !e.target.closest("#settingsBtn")) closeMenu();
+  });
+  $("settingsMenu").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-sec]"); if (b) openSettings(b.getAttribute("data-sec"));
+  });
+
+  /* --- صفحة التعديل (مسودة: لا يُثبَّت شيء إلا بزر «حفظ») --- */
+  var SEC = { fees: ["secFees", "menu_fees"], cur: ["secCur", "menu_cur"], lang: ["secLang", "menu_lang"] };
+  var SNAPF = ["fb", "fs", "eb", "es", "ebk", "ub", "us", "ubk", "rEUR", "rUSD"];
+  var snap = null, curSec = null, draftCurs = ["DZD"], draftLang = "ar";
+  function multiUI() {
+    Array.prototype.forEach.call($("curSeg").querySelectorAll("button"), function (b) {
+      b.setAttribute("aria-pressed", draftCurs.indexOf(b.getAttribute("data-v")) >= 0);
+    });
+    $("rowEUR").hidden = draftCurs.indexOf("EUR") < 0;
+    $("rowUSD").hidden = draftCurs.indexOf("USD") < 0;
+  }
+  function setTitle(sec) {
+    var el = $("setTitle");
+    el.textContent = t(SEC[sec][1]);
+    if (sec === "cur" || sec === "lang") {
+      var i = mkInfo(sec); i.setAttribute("aria-label", t("explain"));
+      el.appendChild(i);
+    }
+  }
+  function openSettings(sec) {
+    closeMenu(); hideTip();
+    curSec = sec;
+    snap = { bm: baridiOn };
+    SNAPF.forEach(function (id) { snap[id] = $(id).value; });
+    draftCurs = curs.slice(); draftLang = lang;
+    multiUI(); segUI("langSeg", draftLang);
+    Object.keys(SEC).forEach(function (k) { $(SEC[k][0]).hidden = k !== sec; });
+    setTitle(sec);
+    $("settingsPage").hidden = false;
+    $("setBody").scrollTop = 0;
+    document.body.style.overflow = "hidden";
+  }
+  function closeSettings() {
+    $("settingsPage").hidden = true;
+    document.body.style.overflow = "";
+    curSec = null; snap = null; hideTip();
+  }
+  function cancelSettings() {
+    if (snap) {
+      SNAPF.forEach(function (id) { $(id).value = snap[id]; });
+      baridiOn = snap.bm;
+      syncFeeUI(); recalcAll();
+    }
+    closeSettings();
+  }
+  function saveSettings() {
+    curs = CUR.filter(function (c) { return draftCurs.indexOf(c) >= 0; });
+    if (!curs.length) curs = ["DZD"];
+    lang = draftLang;
+    fixSel();
+    persist();
+    closeSettings();
+    applyI18n();
+    toast(t("toast_saved"));
+  }
+  function resetSettings() {
+    if (curSec === "fees") {
+      $("fb").value = "0,2"; $("fs").value = "0,2";
+      ["eb", "es", "ub", "us"].forEach(function (id) { $(id).value = "0"; });
+      $("ebk").value = "0,00"; $("ubk").value = "0,00";
+      baridiOn = true;
+      syncFeeUI(); recalcAll();
+    } else if (curSec === "cur") {
+      draftCurs = ["DZD"]; $("rEUR").value = "275"; $("rUSD").value = "";
+      multiUI(); recalcAll();
+    } else if (curSec === "lang") { draftLang = "ar"; segUI("langSeg", draftLang); }
+  }
+  $("setBack").addEventListener("click", cancelSettings);
+  $("setSave").addEventListener("click", saveSettings);
+  $("setReset").addEventListener("click", resetSettings);
+  $("bm").addEventListener("change", function () {
+    baridiOn = this.checked;
+    syncFeeUI(); recalcAll();
+  });
+  $("curSeg").addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return;
+    var v = b.getAttribute("data-v"), i = draftCurs.indexOf(v);
+    if (i >= 0) { if (draftCurs.length > 1) draftCurs.splice(i, 1); } else draftCurs.push(v);
+    multiUI();
+  });
+  $("langSeg").addEventListener("click", function (e) {
+    var b = e.target.closest("button"); if (!b) return;
+    draftLang = b.getAttribute("data-v"); segUI("langSeg", draftLang);
+  });
+  function syncFeeUI() {
+    $("bm").checked = baridiOn;
+    $("bmTable").classList.toggle("off", !baridiOn);
+    $("feesDZD").hidden = curs.indexOf("DZD") < 0;
+    $("feesEUR").hidden = curs.indexOf("EUR") < 0;
+    $("feesUSD").hidden = curs.indexOf("USD") < 0;
+    syncBuyFee();
+  }
+
+  /* ---------- تطبيق اللغة والعملات ---------- */
+  function applyI18n() {
+    hideTip();
+    var h = document.documentElement;
+    h.lang = lang; h.dir = lang === "ar" ? "rtl" : "ltr";
+    document.title = t("title");
+    fixSel();
+    refreshTexts();
+    $("settingsBtn").setAttribute("aria-label", t("settings")); $("settingsBtn").title = t("settings");
+    $("tabs").setAttribute("aria-label", t("pages")); $("bnav").setAttribute("aria-label", t("pages"));
+    $("langSeg").setAttribute("aria-label", t("sec_lang"));
+    $("curSeg").setAttribute("aria-label", t("sec_cur"));
+    $("logs").setAttribute("aria-label", t("log_title"));
+    Array.prototype.forEach.call(document.querySelectorAll(".info"), function (b) { b.setAttribute("aria-label", t("explain")); });
+    Array.prototype.forEach.call(document.querySelectorAll(".stp"), function (b) {
+      b.setAttribute("aria-label", t(b.getAttribute("data-dir") === "up" ? "up" : "down"));
+    });
+    Array.prototype.forEach.call(document.querySelectorAll(".copy-btn"), function (b) { b.setAttribute("aria-label", t("copy_value")); });
+    $("menuCur").textContent = curs.map(sym).join(" · ");
+    $("menuLang").textContent = { ar: "عربي", fr: "Français", en: "English" }[lang];
+    $("setBack").setAttribute("aria-label", t("back"));
+    draftCurs = curs.slice(); multiUI(); segUI("langSeg", lang);
+    syncFeeUI();
+    renderBmTable();
+    calc(); calcTarget(); renderLog();
+  }
+
+  restore();
+  applyI18n();
+})();
+</script>
+<script>
+if ("serviceWorker" in navigator && location.protocol.indexOf("http") === 0) {
+  window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });
+}
+</script>
+</body>
+</html>
