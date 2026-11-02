@@ -1,4 +1,4 @@
-var CACHE = "p2p-usdt-v5";
+var CACHE = "p2p-usdt-v6";
 var FILES = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png"];
 
 self.addEventListener("install", function (e) {

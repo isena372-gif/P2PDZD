@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#1f4fd8">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
@@ -29,19 +29,15 @@
   * { box-sizing: border-box; }
   body { margin:0; background:var(--paper); color:var(--ink);
     font-family:"Noto Sans Arabic","Segoe UI",Tahoma,system-ui,sans-serif; line-height:1.6; -webkit-text-size-adjust:100%; }
-  main { max-width:620px; margin:0 auto; padding:16px 14px 48px; }
+  main { max-width:620px; margin:0 auto; padding:16px 14px calc(96px + env(safe-area-inset-bottom)); }
   .head { display:flex; justify-content:space-between; align-items:center; gap:8px; }
   h1 { font-size:1.25rem; margin:6px 0 4px; }
   h2 { font-size:1rem; margin:0 0 8px; }
   .info { display:inline-flex; align-items:center; justify-content:center; vertical-align:middle;
-    width:13px; height:13px; padding:0; margin-inline-end:5px; border:1.3px solid currentColor; border-radius:50%;
+    width:13px; height:13px; padding:0; margin-inline-start:5px; border:1.3px solid currentColor; border-radius:50%;
     background:transparent; color:inherit; opacity:.7; font-size:.55rem; font-weight:800; line-height:1; position:relative; }
   .info::after { content:""; position:absolute; inset:-8px; }
   .info:hover, .info[aria-expanded="true"] { opacity:1; }
-  .tabcell { position:relative; }
-  .tabcell > button:not(.info) { width:100%; padding-right:24px; }
-  .tabcell > #tabTarget { font-size:clamp(.85rem, 4vw, 1rem); white-space:normal; line-height:1.3; text-wrap:balance; }
-  .tabcell > .info { position:absolute; right:6px; top:50%; margin:0; transform:translateY(-50%); z-index:2; color:var(--muted); }
   #settingsBtn { font-size:1.2rem; line-height:1; padding:7px 12px; }
   #settingsBtn[aria-expanded="true"] { background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
   .headact { display:flex; align-items:center; gap:6px; }
@@ -57,9 +53,9 @@
   .slider { direction:ltr; position:relative; flex:0 0 46px; width:46px; height:26px; border-radius:26px; background:var(--line); transition:background .2s; }
   .slider::after { content:""; position:absolute; top:3px; left:3px; width:20px; height:20px; border-radius:50%; background:#fff;
     box-shadow:0 1px 3px rgba(0,0,0,.3); transition:transform .2s; }
-  .switch input:checked + .slider { background:var(--accent); }
-  .switch input:checked + .slider::after { transform:translateX(20px); }
-  .switch input:focus-visible + .slider { outline:3px solid var(--accent); outline-offset:2px; }
+  .switch input:checked ~ .slider { background:var(--accent); }
+  .switch input:checked ~ .slider::after { transform:translateX(20px); }
+  .switch input:focus-visible ~ .slider { outline:3px solid var(--accent); outline-offset:2px; }
   #bmTable { transition:opacity .2s; }
   #bmTable.off { opacity:.4; }
   .seg { display:flex; gap:6px; }
@@ -79,7 +75,7 @@
   #topReal, #topSell, #curReal { display:inline-block; }
   tr.new td { animation:rowFlash 1.1s ease-out; }
   @keyframes rowFlash { from { background:var(--result); } to { background:transparent; } }
-  .toast { position:fixed; left:50%; bottom:22px; z-index:50; transform:translate(-50%, 16px); opacity:0; pointer-events:none;
+  .toast { position:fixed; left:50%; bottom:calc(88px + env(safe-area-inset-bottom)); z-index:50; transform:translate(-50%, 16px); opacity:0; pointer-events:none;
     background:var(--ink); color:var(--paper); padding:10px 18px; border-radius:24px; font-weight:700; font-size:.92rem;
     box-shadow:0 6px 20px rgba(0,0,0,.25); transition:opacity .22s, transform .22s; }
   .toast.show { opacity:1; transform:translate(-50%, 0); }
@@ -91,19 +87,13 @@
   .tb.b { background:var(--result); color:var(--result-ink); }
   .tb { padding:8px 9px; min-width:0; }
   .tb.g { background:var(--card); border:1px solid var(--accent); color:var(--ink); }
-  .tb.g label { margin:0 0 4px; color:var(--muted); }
+  .tb.g label { margin:4px 0 0; color:var(--muted); }
   .tb.g input { font-size:1.15rem; font-weight:700; padding:6px 6px; border-radius:8px; }
   .tb.g .stp-col { flex-basis:30px; }
   .tb.g .stepper { gap:4px; }
   .tb .name { font-size:.72rem; opacity:.9; line-height:1.3; }
   .tb .val { font-size:1.3rem; font-weight:800; line-height:1.25; direction:ltr; text-align:right; font-variant-numeric:tabular-nums; }
   .tb .unit { font-size:.78rem; font-weight:600; }
-  .tabs { position:relative; display:grid; grid-template-columns:repeat(3,1fr); gap:6px; background:var(--line); padding:4px; border-radius:12px; margin:8px 0 4px; }
-  .tabs::before { content:""; position:absolute; top:4px; bottom:4px; right:4px; width:calc((100% - 20px) / 3);
-    background:var(--card); border-radius:9px; box-shadow:0 1px 2px rgba(19,35,63,.2);
-    transform:translateX(calc(var(--idx, 0) * -1 * (100% + 6px))); transition:transform .28s cubic-bezier(.3,.8,.3,1); }
-  .tabs button:not(.info) { position:relative; z-index:1; border:0; background:transparent; color:var(--muted); font-weight:700; padding:10px 6px; border-radius:9px; transition:color .2s; }
-  .tabs button[aria-selected="true"] { color:var(--ink); }
   .panel { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px; margin-top:12px; }
   .grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
   .grid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
@@ -155,10 +145,10 @@
   .tag.sell { background:var(--tagsell); color:var(--tagsell-ink); }
   .x { background:transparent; border:0; color:var(--danger); font-size:1.05rem; padding:2px 8px; }
   .cells { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px; }
-  .cell { border-radius:12px; padding:10px 12px; min-width:0; }
-  .cell .name { font-size:.78rem; opacity:.9; line-height:1.3; }
-  .cell .val { font-size:1.4rem; font-weight:800; line-height:1.3; direction:ltr; text-align:right; font-variant-numeric:tabular-nums; }
-  .cell .unit { font-size:.78rem; font-weight:600; }
+  .cell { border-radius:12px; padding:8px 10px; min-width:0; }
+  .cell .name { font-size:.72rem; opacity:.9; line-height:1.3; }
+  .cell .val { font-size:1.15rem; font-weight:800; line-height:1.3; direction:ltr; text-align:right; font-variant-numeric:tabular-nums; }
+  .cell .unit { font-size:.7rem; font-weight:600; }
   .cell.c1 { background:var(--second); color:var(--second-ink); }
   .cell.c2 { background:var(--result); color:var(--result-ink); }
   .cell.c3 { background:var(--paper); border:1px solid var(--line); color:var(--ink); }
@@ -171,6 +161,29 @@
   .empty { color:var(--muted); padding:14px 2px; }
 
   .head { position:relative; }
+  /* ---- الصفحات كملفات: الأمامية تغطّي البقية ---- */
+  .tabs { position:relative; z-index:4; display:grid; grid-template-columns:repeat(2, 1fr); gap:4px; align-items:stretch;
+    margin:12px 0 0; margin-bottom:-1px; }
+  .ftab { position:relative; display:flex; margin-top:7px; background:var(--line); border:1px solid var(--line); border-bottom:0;
+    border-radius:12px 12px 0 0; transition:margin-top .28s cubic-bezier(.3,.8,.3,1), background-color .28s; }
+  .ftab.active { margin-top:0; background:var(--card); }
+  .tabbtn { flex:1; min-width:0; padding:12px 8px; padding-inline-end:24px; border:0; background:transparent; color:var(--muted);
+    font-weight:800; font-size:1rem; line-height:1.3; text-align:center; transition:color .25s; }
+  .ftab.active .tabbtn { color:var(--ink); }
+  .ftab > .info { position:absolute; inset-inline-end:6px; top:50%; margin:0; transform:translateY(-50%); z-index:2; color:var(--muted); }
+  .ftab.active > .info { color:var(--ink); }
+  .folders { position:relative; padding-bottom:18px; }
+  .folders::before, .folders::after { content:""; position:absolute; z-index:0; background:var(--card); border:1px solid var(--line);
+    border-radius:0 0 14px 14px; }
+  .folders::before { inset-inline:24px; bottom:0; height:30px; opacity:.65; }
+  .folders::after { inset-inline:12px; bottom:9px; height:30px; opacity:.9; }
+  .fsheet { position:relative; z-index:1; background:var(--card); border:1px solid var(--line); border-radius:0 0 14px 14px;
+    padding:6px 14px 16px; box-shadow:0 2px 6px rgba(19,35,63,.07); }
+  .fsheet > .panel { background:transparent; border:0; padding:0; margin-top:8px; }
+  .fsheet.coming { z-index:3; animation:comeFront .4s cubic-bezier(.2,.8,.2,1) both; }
+  .fsheet.going { position:absolute; top:0; inset-inline:0; z-index:2; pointer-events:none; animation:goBack .4s ease both; }
+  @keyframes comeFront { from { transform:translateY(18px) scale(.94); opacity:.4; } to { transform:none; opacity:1; } }
+  @keyframes goBack { from { transform:none; opacity:1; } to { transform:translateY(14px) scale(.93); opacity:.25; } }
   .menu { position:absolute; top:calc(100% + 4px); inset-inline-end:0; z-index:30; min-width:220px; padding:6px;
     background:var(--card); border:1px solid var(--line); border-radius:12px; box-shadow:0 10px 28px rgba(0,0,0,.22); animation:pageIn .16s ease-out; }
   .menu button { display:flex; width:100%; align-items:center; justify-content:space-between; gap:14px; padding:11px 12px;
@@ -188,31 +201,92 @@
   .sfoot .btn { margin-top:0; width:auto; flex:1.5; }
   .sfoot .btn2 { flex:1; padding:10px 8px; font-size:.9rem; }
   .res, .tb { position:relative; }
+  .res { display:flex; flex-direction:column-reverse; }
   /* محاذاة: العنوان في الأعلى والقيمة/الخانة في الأسفل، فتصطف الأرقام مهما اختلف طول العناوين */
-  .grid > div { display:flex; flex-direction:column; justify-content:flex-end; }
-  .grid > div > label { margin-bottom:5px; }
-  .tb { display:flex; flex-direction:column; justify-content:space-between; }
-  .cell { display:flex; flex-direction:column; justify-content:space-between; }
+  .grid > div, .pair > .f { display:flex; flex-direction:column-reverse; justify-content:flex-end; }
+  .grid > div > label, .pair > .f > label { margin:5px 0 0; }
+  #bkRow { display:flex; flex-direction:column-reverse; }
+  #bkRow > label { margin:5px 0 0; }
+  .tb { display:flex; flex-direction:column-reverse; justify-content:space-between; }
+  .cell { display:flex; flex-direction:column-reverse; justify-content:space-between; }
   .mini input:not([type]), .ro { height:40px; padding:0 9px; box-sizing:border-box; }
   .mini .stp { min-height:17px; }
-  .copy-btn { position:absolute; top:8px; inset-inline-end:8px; width:26px; height:26px; padding:0; display:inline-flex;
+  .copy-btn { position:absolute; top:8px; inset-inline-end:8px; width:21px; height:21px; padding:0; display:inline-flex;
     align-items:center; justify-content:center; border:1.3px solid currentColor; border-radius:8px; background:transparent;
     color:inherit; opacity:.65; }
   .copy-btn:hover, .copy-btn:active { opacity:1; }
-  .copy-btn svg { display:block; }
-  .tb .copy-btn { top:6px; inset-inline-end:6px; width:22px; height:22px; border-radius:7px; }
-  .tb .copy-btn svg { width:12px; height:12px; }
-  .res .name { padding-inline-end:34px; }
-  .tb.b .name { padding-inline-end:22px; }
+  .copy-btn svg { display:block; width:11px; height:11px; }
+  .tb .copy-btn { top:5px; inset-inline-end:5px; width:16px; height:16px; border-radius:6px; }
+  .tb .copy-btn svg { width:9px; height:9px; }
   .mini { margin-top:12px; }
   .mini label { font-size:.76rem; line-height:1.3; }
   .mini input:not([type]), .ro { font-size:.92rem; padding:7px 9px; }
   .ro { display:flex; align-items:center; justify-content:flex-end; min-height:38px; font-weight:700; direction:ltr;
     background:var(--paper); border:1px solid var(--line); border-radius:10px; font-variant-numeric:tabular-nums; }
+  /* ---- خانات الإدخال في جهة والنتائج في الجهة المقابلة ---- */
+  .pair { display:grid; grid-template-columns:1fr 1fr; gap:12px; align-items:stretch; }
+  .pair > .mini { margin-top:0; }
+  .rcell { position:relative; min-width:0; display:flex; flex-direction:column-reverse; justify-content:center;
+    margin-top:0; padding:10px 12px; border-radius:12px; background:var(--paper); border:1px solid var(--line); color:var(--ink); }
+  .rcell .name { font-size:.78rem; line-height:1.3; opacity:.88; padding:0; }
+  .rcell .val, .rcell .big { font-size:1.5rem; font-weight:800; line-height:1.25; direction:ltr; text-align:right; font-variant-numeric:tabular-nums; }
+  .rcell .unit { font-size:.78rem; font-weight:600; }
+  .pair .res.a { background:var(--second); border-color:transparent; color:var(--second-ink); }
+  .pair .res.b { background:var(--result); border-color:transparent; color:var(--result-ink); }
+  .rcell.gain { background:var(--tagsell); border-color:transparent; color:var(--tagsell-ink); }
+  .rcell.loss { background:var(--lossbg); border-color:transparent; color:var(--danger); }
+  html[dir="ltr"] .rcell .val, html[dir="ltr"] .rcell .big { text-align:left; }
+  .pair > .f:not(.mini) input:not([type]), .pair > .f > .ro { height:46px; box-sizing:border-box; }
+  .pair > .f > .ro { padding:0 12px; font-size:1.05rem; gap:6px; }
+  .ro .unit { font-size:.78rem; font-weight:600; opacity:.85; }
+  .pair .res.a { padding:16px 14px; }
+  .pair .res.a .big { font-size:2.2rem; }
+  #sProfitCell { padding:16px 14px; }
+  #sProfitCell .val { font-size:2.2rem; }
+  /* ---- شريط النتائج متعدد العملات ---- */
+  .topbar { grid-template-columns:repeat(6, 1fr); }
+  .topbar .tb { grid-column:span 2; }
+  .topbar[data-n="2"] .tb, .topbar[data-n="3"] .tb.g, .topbar[data-n="3"] .tb.q { grid-column:span 3; }
+  .topbar[data-n="3"] .tb.b { grid-column:span 2; }
+  .tb.q { background:var(--second); color:var(--second-ink); }
+  .curbtn { flex:0 0 auto; min-width:40px; padding:0 6px; border:1px solid var(--line); border-radius:10px; background:var(--paper);
+    color:var(--ink); font-weight:800; font-size:.85rem; }
+  .curbtn:active { background:var(--second); }
+  .sh2 { font-size:.95rem; margin:18px 0 8px; padding-top:12px; border-top:1px solid var(--line); }
+  #feesDZD > .sh2:first-child, #feesEUR > .sh2:first-child, #feesUSD > .sh2:first-child { margin-top:14px; }
+  #secFees > div:first-child:not([hidden]) > .sh2:first-child { margin-top:0; padding-top:0; border-top:0; }
+  .grid.rates { margin-top:14px; }
+  /* ---- شريط النتائج: الكمية والربح الإجمالي، ثم الربح وسعر البيع لكل عملة ---- */
+  .results { margin-top:12px; }
+  .results .cells { margin-bottom:0; }
+  .results .cur-cols, .results .cells { gap:6px; }
+  .curcol { gap:6px; }
+  .cell { position:relative; }
+  .cell .subv { margin-top:2px; font-size:.66rem; font-weight:700; line-height:1.4; opacity:.85; direction:ltr; }
+  .cur-cols { display:grid; grid-template-columns:1fr; gap:8px; margin-top:8px; }
+  .results[data-n="2"] .cur-cols { grid-template-columns:repeat(2, 1fr); }
+  .results[data-n="3"] .cur-cols { grid-template-columns:repeat(3, 1fr); }
+  .curcol { display:flex; flex-direction:column; gap:8px; min-width:0; }
+  .cell .copy-btn { top:6px; inset-inline-end:6px; width:18px; height:18px; border-radius:6px; }
+  .cell .copy-btn svg { width:10px; height:10px; }
+  .gcell .stepper input:not([type]) { background:transparent; border:0; border-radius:0; box-shadow:none; padding:0; height:auto;
+    font-size:1.15rem; font-weight:800; color:inherit; min-width:0; }
+  .gcell .stp-col { flex-basis:30px; }
+  .gcell .stp { min-height:15px; font-size:.6rem; }
+  .gcell .stepper { gap:4px; }
+  /* ---- شريط التنقل السفلي (ثلاث صفحات منفصلة) ---- */
+  .bottomnav { position:fixed; left:0; right:0; bottom:0; z-index:20; display:grid; grid-template-columns:repeat(3, 1fr);
+    padding:6px 8px calc(6px + env(safe-area-inset-bottom)); background:var(--card); border-top:1px solid var(--line);
+    background:color-mix(in srgb, var(--card) 90%, transparent); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); }
+  .bottomnav > button { display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 2px; border:0; background:transparent;
+    color:var(--muted); font-size:.72rem; font-weight:700; line-height:1.2; transition:color .2s; }
+  .bottomnav > button svg { width:24px; height:24px; transition:transform .25s cubic-bezier(.3,.8,.3,1); }
+  .bottomnav > button[aria-selected="true"] { color:var(--accent); }
+  .bottomnav > button[aria-selected="true"] svg { transform:translateY(-1px) scale(1.08); }
+  .solo { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:6px 14px 16px; margin-top:12px;
+    box-shadow:0 2px 6px rgba(19,35,63,.07); }
+  .solo > .panel { background:transparent; border:0; padding:0; margin-top:8px; }
   /* ---- اتجاه LTR (الفرنسية والإنجليزية) ---- */
-  html[dir="ltr"] .tabs::before { right:auto; left:4px; transform:translateX(calc(var(--idx, 0) * (100% + 6px))); }
-  html[dir="ltr"] .tabcell > .info { right:auto; left:6px; }
-  html[dir="ltr"] .tabcell > button:not(.info) { padding-right:6px; padding-left:24px; }
   html[dir="ltr"] input:not([type]) { text-align:left; }
   html[dir="ltr"] .res .big, html[dir="ltr"] .cell .val, html[dir="ltr"] .tb .val { text-align:left; }
   html[dir="ltr"] th, html[dir="ltr"] td { text-align:left; }
@@ -232,99 +306,142 @@
     </div>
   </header>
 
-  <div class="topbar">
-    <div class="tb g">
-      <label class="name" for="g"><span data-i18n="lbl_g">الربح المطلوب (دج)</span></label>
-      <input id="g" inputmode="decimal" value="2,00" autocomplete="off">
+  <div class="results" id="topbar" data-n="1">
+    <div class="cells">
+      <div class="cell c3">
+        <div class="name" id="qtyName"><span data-i18n="top_qty">كمية USDT</span></div>
+        <div class="val"><span id="topQ">0.00</span> <span class="unit">USDT</span></div>
+      </div>
+      <div class="cell c3" id="cTot">
+        <div class="name" id="totName"><span data-i18n="top_profit">الربح الإجمالي</span></div>
+        <div class="val"><span id="topProfit">—</span> <span class="unit">USDT</span><div class="subv" id="topProfitSub"></div></div>
+      </div>
     </div>
-    <div class="tb a" role="status" aria-live="polite">
-      <div class="name"><span data-i18n="top_real">متوسط التكلفة الفعلية</span></div>
-      <div class="val"><span id="topReal">—</span> <span class="unit" data-unit>دج</span></div>
-    </div>
-    <div class="tb b">
-      <button type="button" class="copy-btn" data-src="topSell" aria-label="نسخ القيمة"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg></button>
-      <div class="name"><span data-i18n="top_sell">متوسط سعر البيع المثالي</span></div>
-      <div class="val"><span id="topSell">—</span> <span class="unit" data-unit>دج</span></div>
+    <div class="cur-cols">
+      <div class="curcol" id="col_DZD">
+        <div class="cell c3 gcell">
+          <label class="name" for="gDZD"><span data-i18n="lbl_gD">الربح المطلوب (دج)</span></label>
+          <input id="gDZD" inputmode="decimal" value="2,00" autocomplete="off">
+        </div>
+        <div class="cell c2" id="tbP_DZD">
+          <button type="button" class="copy-btn" data-src="topP_DZD" aria-label="نسخ القيمة"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg></button>
+          <div class="name pname"><span data-i18n="top_sell">سعر البيع المثالي</span></div>
+          <div class="val"><span id="topP_DZD">—</span> <span class="unit" data-cursym="DZD">دج</span></div>
+        </div>
+      </div>
+      <div class="curcol" id="col_EUR" hidden>
+        <div class="cell c3 gcell">
+          <label class="name" for="gEUR"><span data-i18n="lbl_gE">الربح المطلوب (€)</span></label>
+          <input id="gEUR" inputmode="decimal" value="0,010" autocomplete="off">
+        </div>
+        <div class="cell c2" id="tbP_EUR">
+          <button type="button" class="copy-btn" data-src="topP_EUR" aria-label="نسخ القيمة"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg></button>
+          <div class="name pname"><span data-i18n="top_sell">سعر البيع المثالي</span></div>
+          <div class="val"><span id="topP_EUR">—</span> <span class="unit" data-cursym="EUR">€</span></div>
+        </div>
+      </div>
+      <div class="curcol" id="col_USD" hidden>
+        <div class="cell c3 gcell">
+          <label class="name" for="gUSD"><span data-i18n="lbl_gU">الربح المطلوب ($)</span></label>
+          <input id="gUSD" inputmode="decimal" value="0,010" autocomplete="off">
+        </div>
+        <div class="cell c2" id="tbP_USD">
+          <button type="button" class="copy-btn" data-src="topP_USD" aria-label="نسخ القيمة"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg></button>
+          <div class="name pname"><span data-i18n="top_sell">سعر البيع المثالي</span></div>
+          <div class="val"><span id="topP_USD">—</span> <span class="unit" data-cursym="USD">$</span></div>
+        </div>
+      </div>
     </div>
   </div>
 
+  <section id="viewOps" class="view">
   <div class="tabs" id="tabs" role="tablist" aria-label="الصفحات">
-    <button role="tab" id="tabBuy" aria-selected="true" data-i18n="tab_buy">الشراء</button>
-    <button role="tab" id="tabSell" aria-selected="false" data-i18n="tab_sell">البيع</button>
-    <button role="tab" id="tabTarget" aria-selected="false" data-i18n="tab_target">سعر الشراء المستهدف</button>
+    <div class="ftab active" id="ftabBuy"><button type="button" class="tabbtn" role="tab" id="tabBuy" aria-selected="true" data-i18n="tab_buy">الشراء</button></div>
+    <div class="ftab" id="ftabSell"><button type="button" class="tabbtn" role="tab" id="tabSell" aria-selected="false" data-i18n="tab_sell">البيع</button></div>
   </div>
 
-  <!-- صفحة الشراء -->
-  <section id="pageBuy">
+  <div class="folders" id="folders">
+    <section id="pageBuy" class="fsheet">
     <div class="panel">
-      <div class="grid">
-        <div>
+      <div class="pair">
+        <div class="f">
           <label for="a"><span data-i18n="lbl_a">مبلغ الشراء (دج)</span></label>
           <input id="a" inputmode="decimal" placeholder="12800" autocomplete="off">
         </div>
-        <div>
-          <label for="p"><span data-i18n="lbl_p">السعر المعلن (دج/USDT)</span></label>
-          <input id="p" inputmode="decimal" placeholder="255,06" autocomplete="off">
-        </div>
-      </div>
-      <div class="grid mini">
-        <div id="bkfBox" hidden>
-          <label for="bkf"><span data-i18n="lbl_bkf">رسوم التحويل البنكي</span></label>
-          <input id="bkf" inputmode="decimal" autocomplete="off">
-        </div>
-        <div>
+        <div class="f">
           <label id="netqLabel"><span data-i18n="lbl_netq">الكمية الصافية المشتراة (USDT)</span></label>
           <div class="ro"><span id="netQ">—</span></div>
         </div>
+        <div class="f">
+          <label for="p"><span data-i18n="lbl_p">السعر المعلن (دج/USDT)</span></label>
+          <input id="p" inputmode="decimal" placeholder="255,06" autocomplete="off">
+        </div>
+        <div class="res a rcell" role="status" aria-live="polite">
+          <button type="button" class="copy-btn" data-src="curReal" aria-label="نسخ القيمة"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg></button>
+          <div class="name"><span data-i18n="cur_real">التكلفة الفعلية لشراء الوحدة</span></div>
+          <div class="big"><span id="curReal">—</span> <span class="unit" id="curRealU">دج</span></div>
+        </div>
+        <div class="f mini" id="bkfBox" hidden>
+          <label for="bkf"><span data-i18n="lbl_bkf">رسوم التحويل البنكي</span></label>
+          <input id="bkf" inputmode="decimal" autocomplete="off">
+        </div>
       </div>
     </div>
-
-    <div class="res a" role="status" aria-live="polite">
-      <button type="button" class="copy-btn" data-src="curReal" aria-label="نسخ القيمة"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg></button>
-      <div class="name"><span data-i18n="cur_real">التكلفة الفعلية لشراء الوحدة</span></div>
-      <div class="big"><span id="curReal">—</span> <span class="unit" data-unit>دج</span></div>
-    </div>
-
     <button class="btn" id="save" disabled data-i18n="btn_save">تسجيل عملية الشراء</button>
   </section>
-
-  <!-- صفحة البيع -->
-  <section id="pageSell" hidden>
+    <section id="pageSell" class="fsheet" hidden>
     <div class="panel">
-      <div class="grid">
-        <div>
+      <div class="pair">
+        <div class="f">
           <label for="sq"><span data-i18n="lbl_sq">الكمية المباعة (USDT)</span></label>
           <input id="sq" inputmode="decimal" autocomplete="off">
         </div>
-        <div>
+        <div class="f">
+          <label id="sAmtName"><span data-i18n="sell_amount">مبلغ البيع</span></label>
+          <div class="ro"><span id="sAmt">—</span><span class="unit" id="sAmtU">دج</span></div>
+        </div>
+        <div class="f">
           <label for="sp"><span data-i18n="lbl_sp">سعر البيع (دج/USDT)</span></label>
           <input id="sp" inputmode="decimal" autocomplete="off">
         </div>
+        <div class="rcell" id="sProfitCell">
+          <div class="name" id="sProfitName"><span data-i18n="sell_profit">ربح العملية</span></div>
+          <div class="val"><span id="sProfit">—</span> <span class="unit" id="sProfU">دج</span></div>
+        </div>
       </div>
     </div>
-    <div id="sout"></div>
     <button class="btn" id="ssave" disabled data-i18n="btn_ssave">تسجيل عملية البيع</button>
   </section>
+    
+  </div>
+  </section>
 
-  <!-- صفحة سعر الشراء المستهدف -->
-  <section id="pageTarget" hidden>
+  <section id="viewTarget" class="view" hidden>
+    <section id="pageTarget" class="solo">
     <div class="panel">
-      <div class="grid">
-        <div>
+      <div class="pair">
+        <div class="f" style="grid-area:1/1">
           <label for="ts"><span data-i18n="lbl_ts">سعر البيع (دج/USDT)</span></label>
           <input id="ts" inputmode="decimal" placeholder="255" autocomplete="off">
         </div>
-        <div>
+        <div class="f" style="grid-area:2/1">
           <label for="ta"><span data-i18n="lbl_ta">مبلغ الشراء (اختياري)</span></label>
           <input id="ta" inputmode="decimal" placeholder="12800" autocomplete="off">
+        </div>
+        <div class="res b rcell" style="grid-area:1/2/3/3">
+          <button type="button" class="copy-btn" id="tCopy" data-v="" aria-label="نسخ القيمة"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg></button>
+          <div class="name" id="tName"><span data-i18n="t_buy_label">اشترِ عند هذا السعر أو أقل</span></div>
+          <div class="big"><span id="tVal">—</span> <span class="unit" id="tU">دج</span></div>
         </div>
       </div>
     </div>
     <div id="tout"></div>
   </section>
+  </section>
 
   <!-- السجل المشترك -->
-  <section class="panel" id="logs" aria-label="سجل العمليات">
+  <div id="viewLog" class="view" hidden>
+    <section class="panel" id="logs" aria-label="سجل العمليات">
     <h2 data-i18n="log_title">سجل العمليات</h2>
     <div id="sum"></div>
     <div id="log"></div>
@@ -334,7 +451,13 @@
     </div>
     <p class="hint" data-i18n="log_hint"></p>
   </section>
+  </div>
 </main>
+<nav class="bottomnav" id="bnav" role="tablist" aria-label="الصفحات">
+  <button type="button" role="tab" id="navOps" aria-selected="true" data-view="ops"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3L4 7l4 4"/><path d="M4 7h16"/><path d="M16 21l4-4-4-4"/><path d="M20 17H4"/></svg><span data-i18n="nav_ops">العمليات</span></button>
+  <button type="button" role="tab" id="navLog" aria-selected="false" data-view="log"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13"/><path d="M3 6h.01M3 12h.01M3 18h.01"/></svg><span data-i18n="nav_log">السجل</span></button>
+  <button type="button" role="tab" id="navTarget" aria-selected="false" data-view="target"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg><span data-i18n="nav_target">السعر المستهدف</span></button>
+</nav>
 <div class="spage" id="settingsPage" role="dialog" aria-modal="true" hidden>
   <div class="sbar">
     <button type="button" class="backbtn" id="setBack" aria-label="رجوع"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
@@ -342,29 +465,48 @@
   </div>
   <div class="sbody" id="setBody">
     <section id="secFees" hidden>
-      <div class="grid">
-        <div><label for="fb"><span data-i18n="lbl_fb">رسوم الشراء (%)</span></label><input id="fb" inputmode="decimal" value="0,2" autocomplete="off"></div>
-        <div><label for="fs"><span data-i18n="lbl_fs">رسوم البيع (%)</span></label><input id="fs" inputmode="decimal" value="0,2" autocomplete="off"></div>
+      <div id="feesDZD">
+        <h3 class="sh2"><span data-i18n="fee_h_DZD">الدينار (DZD)</span></h3>
+        <div class="grid">
+          <div><label for="fb"><span data-i18n="lbl_fb">رسوم الشراء (%)</span></label><input id="fb" inputmode="decimal" value="0,2" autocomplete="off"></div>
+          <div><label for="fs"><span data-i18n="lbl_fs">رسوم البيع (%)</span></label><input id="fs" inputmode="decimal" value="0,2" autocomplete="off"></div>
+        </div>
+        <label class="switch" for="bm">
+          <input type="checkbox" id="bm" checked>
+          <span class="slider" aria-hidden="true"></span>
+          <span class="lbl" data-i18n="sw_fee">احتساب رسوم بريدي موب في الحساب</span>
+        </label>
+        <div class="scroll" id="bmTable"><table>
+          <thead><tr><th data-i18n="th_range">مجال المبلغ (دج)</th><th data-i18n="th_baridi">خصم بريدي موب</th></tr></thead>
+          <tbody id="bmBody"></tbody>
+        </table></div>
       </div>
-      <label class="switch" for="bm">
-        <input type="checkbox" id="bm" checked>
-        <span class="slider" aria-hidden="true"></span>
-        <span class="lbl" data-i18n="sw_fee">احتساب رسوم بريدي موب في الحساب</span>
-      </label>
-      <div class="scroll" id="bmTable"><table>
-        <thead><tr><th data-i18n="th_range">مجال المبلغ (دج)</th><th data-i18n="th_baridi">خصم بريدي موب</th></tr></thead>
-        <tbody id="bmBody"></tbody>
-      </table></div>
-      <div id="bkRow" hidden>
-        <label for="bk"><span data-i18n="lbl_bk">رسوم التحويل البنكي</span></label>
-        <input id="bk" inputmode="decimal" value="0,00" autocomplete="off">
+      <div id="feesEUR" hidden>
+        <h3 class="sh2"><span data-i18n="fee_h_EUR">اليورو (EUR)</span></h3>
+        <div class="grid">
+          <div><label for="eb"><span data-i18n="lbl_fb">رسوم الشراء (%)</span></label><input id="eb" inputmode="decimal" value="0" autocomplete="off"></div>
+          <div><label for="es"><span data-i18n="lbl_fs">رسوم البيع (%)</span></label><input id="es" inputmode="decimal" value="0" autocomplete="off"></div>
+          <div><label for="ebk"><span data-i18n="lbl_ebk">رسم التحويل الثابت (€)</span></label><input id="ebk" inputmode="decimal" value="0,00" autocomplete="off"></div>
+        </div>
+      </div>
+      <div id="feesUSD" hidden>
+        <h3 class="sh2"><span data-i18n="fee_h_USD">الدولار (USD)</span></h3>
+        <div class="grid">
+          <div><label for="ub"><span data-i18n="lbl_fb">رسوم الشراء (%)</span></label><input id="ub" inputmode="decimal" value="0" autocomplete="off"></div>
+          <div><label for="us"><span data-i18n="lbl_fs">رسوم البيع (%)</span></label><input id="us" inputmode="decimal" value="0" autocomplete="off"></div>
+          <div><label for="ubk"><span data-i18n="lbl_ubk">رسم التحويل الثابت ($)</span></label><input id="ubk" inputmode="decimal" value="0,00" autocomplete="off"></div>
+        </div>
       </div>
     </section>
     <section id="secCur" hidden>
-      <div class="seg" id="curSeg" role="group" aria-label="العملة">
+      <div class="seg" id="curSeg" role="group" aria-label="العملات">
         <button type="button" data-v="DZD" aria-pressed="true">DZD</button>
-        <button type="button" data-v="EUR" aria-pressed="false">€</button>
-        <button type="button" data-v="USD" aria-pressed="false">$</button>
+        <button type="button" data-v="EUR" aria-pressed="false">€ EUR</button>
+        <button type="button" data-v="USD" aria-pressed="false">$ USD</button>
+      </div>
+      <div class="grid rates" id="rates">
+        <div id="rowEUR" hidden><label for="rEUR"><span data-i18n="lbl_reur">سعر 1 € بالدينار (دج)</span></label><input id="rEUR" inputmode="decimal" value="275" autocomplete="off"></div>
+        <div id="rowUSD" hidden><label for="rUSD"><span data-i18n="lbl_rusd">سعر 1 $ بالدينار (دج)</span></label><input id="rUSD" inputmode="decimal" value="" placeholder="0,00" autocomplete="off"></div>
       </div>
     </section>
     <section id="secLang" hidden>
@@ -388,11 +530,12 @@
   var $ = function (id) { return document.getElementById(id); };
   var sManual = { sq: false, sp: false };
   var last = null, ops = [], counter = 0;
-  var baridiOn = true, lang = "ar", curr = "DZD", bfManual = false;
+  var baridiOn = true, lang = "ar", bfManual = false;
 
   /* ---------- الترجمة ---------- */
   var T = {
     ar: {
+      t_buy_label: "اشترِ عند هذا السعر أو أقل",
       menu_fees: "إعدادات الرسوم", menu_cur: "اختيار العملة", menu_lang: "اختيار اللغة", save_settings: "حفظ", reset_settings: "الإعدادات الأولى", back: "رجوع", toast_saved: "تم حفظ الإعدادات ✓",
       lbl_bkf: "رسوم التحويل البنكي ({u})", lbl_netq: "الكمية الصافية المشتراة (USDT)", copy_value: "نسخ القيمة",
       title: "حاسبة P2P USDT", settings: "الإعدادات", pages: "الصفحات", sec_fees: "الرسوم",
@@ -412,12 +555,13 @@
       c_type: "النوع", c_time: "الوقت", c_amount: "المبلغ", c_price: "السعر الفعلي", c_net: "الكمية الصافية", c_profit: "الربح",
       c_listed: "السعر المعلن", c_bought: "الكمية المشتراة", c_afterbuy: "بعد خصم الشراء",
       buy: "شراء", sell: "بيع", toast_buy: "تم تسجيل عملية الشراء ✓", toast_sell: "تم تسجيل عملية البيع ✓",
-      remain: "الكمية المتبقية", profit: "الربح", sell_amount: "مبلغ البيع", sell_cost: "التكلفة (متوسط {0})", sell_profit: "الربح",
+      remain: "الكمية المتبقية", profit: "الربح", sell_amount: "مبلغ البيع", sell_cost: "التكلفة (متوسط {0})", sell_profit: "ربح العملية",
       t_buy_at: "اشترِ عند هذا السعر أو أقل (لمبلغ {0} {u})",
       th_fee_short: "الرسم", th_low: "عند أدنى المبلغ", th_high: "عند أعلى المبلغ", th_amount: "المبلغ ({u})", th_target: "سعر الشراء المستهدف",
       explain: "شرح", up: "زيادة", down: "إنقاص", del_row: "حذف السطر", inc_aria: "احتساب العملية في المتوسط"
     },
     fr: {
+      t_buy_label: "Achetez à ce prix ou moins",
       menu_fees: "Paramètres des frais", menu_cur: "Choix de la devise", menu_lang: "Choix de la langue", save_settings: "Enregistrer", reset_settings: "Réglages initiaux", back: "Retour", toast_saved: "Réglages enregistrés ✓",
       lbl_bkf: "Frais de virement bancaire ({u})", lbl_netq: "Quantité nette achetée (USDT)", copy_value: "Copier la valeur",
       title: "Calculateur P2P USDT", settings: "Paramètres", pages: "Pages", sec_fees: "Frais",
@@ -437,12 +581,13 @@
       c_type: "Type", c_time: "Heure", c_amount: "Montant", c_price: "Prix réel", c_net: "Quantité nette", c_profit: "Profit",
       c_listed: "Prix annoncé", c_bought: "Quantité achetée", c_afterbuy: "Après frais d'achat",
       buy: "Achat", sell: "Vente", toast_buy: "Achat enregistré ✓", toast_sell: "Vente enregistrée ✓",
-      remain: "Quantité restante", profit: "Profit", sell_amount: "Montant de la vente", sell_cost: "Coût (moyenne {0})", sell_profit: "Profit",
+      remain: "Quantité restante", profit: "Profit", sell_amount: "Montant de la vente", sell_cost: "Coût (moyenne {0})", sell_profit: "Profit de l'opération",
       t_buy_at: "Achetez à ce prix ou moins (pour un montant de {0} {u})",
       th_fee_short: "Frais", th_low: "Au montant min.", th_high: "Au montant max.", th_amount: "Montant ({u})", th_target: "Prix d'achat cible",
       explain: "Explication", up: "Augmenter", down: "Diminuer", del_row: "Supprimer la ligne", inc_aria: "Inclure l'opération dans la moyenne"
     },
     en: {
+      t_buy_label: "Buy at this price or lower",
       menu_fees: "Fee settings", menu_cur: "Choose currency", menu_lang: "Choose language", save_settings: "Save", reset_settings: "Initial settings", back: "Back", toast_saved: "Settings saved ✓",
       lbl_bkf: "Bank transfer fee ({u})", lbl_netq: "Net quantity bought (USDT)", copy_value: "Copy value",
       title: "P2P USDT Calculator", settings: "Settings", pages: "Pages", sec_fees: "Fees",
@@ -462,7 +607,7 @@
       c_type: "Type", c_time: "Time", c_amount: "Amount", c_price: "Real price", c_net: "Net quantity", c_profit: "Profit",
       c_listed: "Listed price", c_bought: "Quantity bought", c_afterbuy: "After buy fee",
       buy: "Buy", sell: "Sell", toast_buy: "Purchase recorded ✓", toast_sell: "Sale recorded ✓",
-      remain: "Remaining quantity", profit: "Profit", sell_amount: "Sale amount", sell_cost: "Cost (average {0})", sell_profit: "Profit",
+      remain: "Remaining quantity", profit: "Profit", sell_amount: "Sale amount", sell_cost: "Cost (average {0})", sell_profit: "Profit of this sale",
       t_buy_at: "Buy at this price or lower (for an amount of {0} {u})",
       th_fee_short: "Fee", th_low: "At lowest amount", th_high: "At highest amount", th_amount: "Amount ({u})", th_target: "Target buy price",
       explain: "Explanation", up: "Increase", down: "Decrease", del_row: "Delete row", inc_aria: "Include operation in the average"
@@ -471,6 +616,9 @@
 
   var TIPS = {
     ar: {
+      sellAmt: ["مبلغ البيع", "المبلغ الذي ستحصل عليه: الكمية × سعر البيع."],
+      sellProfit: ["ربح العملية", "الفرق بين مبلغ البيع وتكلفة الكمية المباعة، محسوبة على متوسط تكلفة مشترياتك."],
+      tRes: ["السعر المستهدف", "أعلى سعر شراء تقبل به لتحقق ربحك عند سعر البيع ومبلغ الشراء المكتوبين. انسخه واستعمله في إعلانك."],
       bkf: ["{Fee}", "رسم التحويل لهذه العملية ({u}). يظهر تلقائيًا المبلغ المكتوب في الإعدادات، ويمكنك كتابة قيمة أخرى. يدخل في حساب التكلفة الفعلية."],
       netq: ["الكمية الصافية المشتراة", "الكمية المشتراة (المبلغ ÷ السعر) بعد طرح رسوم الشراء ورسوم البيع. عليها تُبنى التكلفة الفعلية والربح."],
       a: ["مبلغ الشراء", "المبلغ ({u}) الذي ترسله لشراء USDT. يُضاف إليه {fee} لحساب التكلفة الفعلية."],
@@ -497,6 +645,9 @@
       tabTarget: ["سعر الشراء المستهدف", "أداة تحليل: تعطيك أعلى سعر شراء تقبل به لتحقق ربحك عند سعر بيع معيّن، حسب مبلغ الشراء. الربح من الخانة العلوية والرسوم من الإعدادات. للأمان اعتمد عمود «أدنى المبلغ»، والأسعار مقرّبة للأسفل لضمان الربح."]
     },
     fr: {
+      sellAmt: ["Montant de la vente", "Ce que vous recevez : quantité × prix de vente."],
+      sellProfit: ["Profit de l'opération", "La différence entre le montant de la vente et le coût de la quantité vendue, calculée sur le coût moyen de vos achats."],
+      tRes: ["Prix d'achat cible", "Le prix d'achat maximal à accepter pour réaliser votre profit au prix de vente et au montant saisis. Copiez-le pour votre annonce."],
       bkf: ["{Fee}", "Frais de virement pour cette opération ({u}). Le montant des paramètres s'affiche automatiquement ; vous pouvez saisir une autre valeur. Il entre dans le calcul du coût réel."],
       netq: ["Quantité nette achetée", "La quantité achetée (montant ÷ prix) après déduction des frais d'achat et de vente. Le coût réel et le profit se calculent sur cette quantité."],
       a: ["Montant d'achat", "Le montant ({u}) que vous envoyez pour acheter des USDT. Les {fee} s'y ajoutent pour calculer le coût réel."],
@@ -523,6 +674,9 @@
       tabTarget: ["Prix d'achat cible", "Outil d'analyse : donne le prix d'achat maximal à accepter pour réaliser votre profit à un prix de vente donné, selon le montant d'achat. Le profit vient du champ en haut, les frais des paramètres. Par sécurité, utilisez la colonne « Au montant min. » ; les prix sont arrondis à la baisse pour garantir le profit."]
     },
     en: {
+      sellAmt: ["Sale amount", "What you receive: quantity × sell price."],
+      sellProfit: ["Operation profit", "The difference between the sale amount and the cost of the quantity sold, based on the average cost of your purchases."],
+      tRes: ["Target buy price", "The highest buy price you can accept to reach your profit at the sell price and amount entered. Copy it for your listing."],
       bkf: ["{Fee}", "Transfer fee for this operation ({u}). The amount from Settings appears automatically; you can type another value. It is part of the real cost."],
       netq: ["Net quantity bought", "The quantity bought (amount ÷ price) after buy and sell fees. The real cost and profit are based on this quantity."],
       a: ["Purchase amount", "The amount ({u}) you send to buy USDT. The {fee} is added to it to work out the real cost."],
@@ -550,16 +704,154 @@
     }
   };
 
-  function unit() { return curr === "EUR" ? "€" : curr === "USD" ? "$" : (lang === "ar" ? "دج" : "DA"); }
-  function feeName() { var k = curr === "DZD" ? "fee_dz" : "fee_ot"; return (T[lang] && T[lang][k]) || T.ar[k]; }
+
+  /* ---------- تعديلات النصوص للعملات المتعددة ---------- */
+  Object.assign(T.ar, {
+    menu_cur: "العملات وأسعار الصرف", sec_cur: "العملات", top_qty: "كمية USDT", top_sell: "سعر البيع المثالي",
+    lbl_g: "الربح المطلوب ({gu})", lbl_a: "مبلغ الشراء ({bu})", lbl_p: "السعر المعلن ({bu}/USDT)",
+    lbl_sp: "سعر البيع ({su}/USDT)", lbl_ts: "سعر البيع ({tsu}/USDT)", lbl_ta: "مبلغ الشراء ({tbu}) — اختياري",
+    lbl_bkf: "رسم التحويل ({bu})", th_range: "مجال المبلغ ({dz})", th_amount: "المبلغ ({tbu})",
+    lbl_ebk: "رسم التحويل الثابت (€)", lbl_ubk: "رسم التحويل الثابت ($)",
+    lbl_reur: "سعر 1 € بالدينار ({dz})", lbl_rusd: "سعر 1 $ بالدينار ({dz})",
+    fee_h_DZD: "الدينار (DZD)", fee_h_EUR: "اليورو (EUR)", fee_h_USD: "الدولار (USD)", cur_switch: "تغيير العملة"
+  });
+  Object.assign(T.fr, {
+    menu_cur: "Devises et taux de change", sec_cur: "Devises", top_qty: "Quantité USDT", top_sell: "Prix de vente idéal",
+    lbl_g: "Profit visé ({gu})", lbl_a: "Montant d'achat ({bu})", lbl_p: "Prix annoncé ({bu}/USDT)",
+    lbl_sp: "Prix de vente ({su}/USDT)", lbl_ts: "Prix de vente ({tsu}/USDT)", lbl_ta: "Montant d'achat ({tbu}) — facultatif",
+    lbl_bkf: "Frais de virement ({bu})", th_range: "Tranche du montant ({dz})", th_amount: "Montant ({tbu})",
+    lbl_ebk: "Frais de virement fixes (€)", lbl_ubk: "Frais de virement fixes ($)",
+    lbl_reur: "Prix de 1 € en dinars ({dz})", lbl_rusd: "Prix de 1 $ en dinars ({dz})",
+    fee_h_DZD: "Dinar (DZD)", fee_h_EUR: "Euro (EUR)", fee_h_USD: "Dollar (USD)", cur_switch: "Changer de devise"
+  });
+  Object.assign(T.en, {
+    menu_cur: "Currencies and exchange rates", sec_cur: "Currencies", top_qty: "USDT quantity", top_sell: "Ideal sell price",
+    lbl_g: "Target profit ({gu})", lbl_a: "Purchase amount ({bu})", lbl_p: "Listed price ({bu}/USDT)",
+    lbl_sp: "Sell price ({su}/USDT)", lbl_ts: "Sell price ({tsu}/USDT)", lbl_ta: "Purchase amount ({tbu}) — optional",
+    lbl_bkf: "Transfer fee ({bu})", th_range: "Amount range ({dz})", th_amount: "Amount ({tbu})",
+    lbl_ebk: "Fixed transfer fee (€)", lbl_ubk: "Fixed transfer fee ($)",
+    lbl_reur: "Price of 1 € in dinars ({dz})", lbl_rusd: "Price of 1 $ in dinars ({dz})",
+    fee_h_DZD: "Dinar (DZD)", fee_h_EUR: "Euro (EUR)", fee_h_USD: "US dollar (USD)", cur_switch: "Change currency"
+  });
+  Object.assign(TIPS.ar, {
+    a: ["مبلغ الشراء", "المبلغ ({bu}) الذي ترسله لشراء USDT. اضغط رمز العملة بجانب الخانة لاختيار عملة أخرى من عملاتك. يُضاف إليه {fee}."],
+    p: ["السعر المعلن", "سعر الوحدة ({bu} لكل 1 USDT) في إعلان البائع. منه تُحسب الكمية: المبلغ ÷ السعر."],
+    g: ["الربح المطلوب", "الربح الذي تريده لكل 1 USDT بالعملة الأساسية ({gu}). يُحوَّل لباقي العملات بسعر الصرف ثم يُضاف إلى التكلفة."],
+    topQty: ["كمية USDT", "ما تملكه الآن من USDT (المخزون). كل شراء يزيدها وكل بيع ينقصها، وعند الصفر يبدأ الحساب من جديد."],
+    topSell: ["سعر البيع المثالي", "السعر الذي لا يجب أن تبيع تحته ليتحقق ربحك، محسوبًا على المخزون الحالي وبعملة هذه الخانة (برسومها). يتضمن العملية التي تكتبها قبل تسجيلها."],
+    sp: ["سعر البيع", "سعر بيع الوحدة بالعملة المختارة (اضغط رمز العملة لتغييرها). يظهر تلقائيًا السعر المثالي لهذه العملة، ويمكنك تغييره."],
+    ts: ["سعر البيع (للتحليل)", "أفضل سعر بيع معلن بالعملة المختارة. منه يُحسب أعلى سعر شراء يحقق ربحك."],
+    ta: ["مبلغ الشراء (اختياري)", "اكتب مبلغك بعملة الشراء المختارة لتعرف السعر المستهدف الخاص به. اتركه فارغًا لرؤية الجدول كاملًا."],
+    bkf: ["{Fee}", "رسم التحويل لهذه العملية ({bu}). يظهر تلقائيًا المبلغ الثابت من الإعدادات، ويمكنك كتابة قيمة أخرى. يدخل في حساب التكلفة."],
+    netq: ["الكمية الصافية المشتراة", "الكمية المشتراة (المبلغ ÷ السعر) بعد طرح رسوم الشراء. هذه هي الكمية التي تدخل مخزونك."],
+    curReal: ["التكلفة الفعلية لشراء الوحدة", "ما تكلّفك الوحدة فعليًا بعملة الشراء بعد رسوم الشراء ورسم التحويل ورسوم البيع بنفس العملة. هو أقل سعر بيع بدون ربح."],
+    cur: ["العملات", "اختر العملات التي تتداول بها. تظهر النتائج بكل عملة تختارها، وتحتاج سعر صرف لكل عملة غير الدينار."],
+    rEUR: ["سعر اليورو", "عدد الدنانير في 1 €. تُحوَّل به التكاليف والأرباح بين الدينار واليورو. عدّله عند الحاجة."],
+    rUSD: ["سعر الدولار", "عدد الدنانير في 1 $. تُحوَّل به التكاليف والأرباح بين الدينار والدولار."],
+    eb: ["رسوم الشراء (يورو)", "النسبة التي تخصمها المنصة من الكمية عند الشراء باليورو (0 افتراضيًا)."],
+    es: ["رسوم البيع (يورو)", "النسبة التي تخصمها المنصة عند البيع باليورو (0 افتراضيًا)."],
+    ebk: ["رسم التحويل (يورو)", "مبلغ ثابت يُضاف إلى كل شراء باليورو. اتركه 0 إن لم توجد رسوم."],
+    ub: ["رسوم الشراء (دولار)", "النسبة التي تخصمها المنصة من الكمية عند الشراء بالدولار."],
+    us: ["رسوم البيع (دولار)", "النسبة التي تخصمها المنصة عند البيع بالدولار."],
+    ubk: ["رسم التحويل (دولار)", "مبلغ ثابت يُضاف إلى كل شراء بالدولار. اتركه 0 إن لم توجد رسوم."],
+    sellProfit: ["ربح العملية", "الفرق بين مبلغ البيع (محوَّلًا إلى العملة الأساسية) وتكلفة الكمية المباعة على متوسط تكلفة المخزون."]
+  });
+  Object.assign(TIPS.fr, {
+    a: ["Montant d'achat", "Le montant ({bu}) que vous envoyez pour acheter des USDT. Touchez le symbole de devise à côté du champ pour choisir une autre de vos devises. Les {fee} s'y ajoutent."],
+    p: ["Prix annoncé", "Prix unitaire ({bu} pour 1 USDT) dans l'annonce du vendeur. La quantité s'en déduit : montant ÷ prix."],
+    g: ["Profit visé", "Le profit voulu par USDT dans la devise de base ({gu}). Il est converti vers les autres devises au taux de change, puis ajouté au coût."],
+    topQty: ["Quantité USDT", "Ce que vous détenez en USDT (stock). Chaque achat l'augmente, chaque vente la diminue, et à zéro le calcul repart de zéro."],
+    topSell: ["Prix de vente idéal", "Le prix sous lequel il ne faut pas vendre pour obtenir votre profit, calculé sur le stock actuel et dans la devise de cette case (avec ses frais). Il inclut l'opération en cours de saisie."],
+    sp: ["Prix de vente", "Prix de vente unitaire dans la devise choisie (touchez le symbole pour la changer). Le prix idéal de cette devise s'affiche automatiquement ; vous pouvez le modifier."],
+    ts: ["Prix de vente (analyse)", "La meilleure annonce de vente dans la devise choisie. On en déduit le prix d'achat maximal qui garantit votre profit."],
+    ta: ["Montant d'achat (facultatif)", "Saisissez votre montant dans la devise d'achat choisie pour obtenir son prix cible. Laissez vide pour voir tout le tableau."],
+    bkf: ["{Fee}", "Frais de virement pour cette opération ({bu}). Le montant fixe des paramètres s'affiche automatiquement ; vous pouvez saisir une autre valeur. Il entre dans le coût."],
+    netq: ["Quantité nette achetée", "La quantité achetée (montant ÷ prix) après les frais d'achat. C'est elle qui entre dans votre stock."],
+    curReal: ["Coût réel d'achat par unité", "Ce que coûte vraiment une unité dans la devise d'achat après les frais d'achat, de virement et de vente dans cette même devise. C'est le prix de vente minimum sans profit."],
+    cur: ["Devises", "Choisissez les devises avec lesquelles vous tradez. Les résultats s'affichent dans chaque devise choisie ; un taux de change est nécessaire pour chaque devise autre que le dinar."],
+    rEUR: ["Prix de l'euro", "Le nombre de dinars dans 1 €. Il sert à convertir coûts et profits entre dinar et euro. Modifiez-le au besoin."],
+    rUSD: ["Prix du dollar", "Le nombre de dinars dans 1 $. Il sert à convertir coûts et profits entre dinar et dollar."],
+    eb: ["Frais d'achat (euro)", "Pourcentage prélevé par la plateforme à l'achat en euros (0 par défaut)."],
+    es: ["Frais de vente (euro)", "Pourcentage prélevé par la plateforme à la vente en euros (0 par défaut)."],
+    ebk: ["Frais de virement (euro)", "Montant fixe ajouté à chaque achat en euros. Laissez 0 s'il n'y a pas de frais."],
+    ub: ["Frais d'achat (dollar)", "Pourcentage prélevé par la plateforme à l'achat en dollars."],
+    us: ["Frais de vente (dollar)", "Pourcentage prélevé par la plateforme à la vente en dollars."],
+    ubk: ["Frais de virement (dollar)", "Montant fixe ajouté à chaque achat en dollars. Laissez 0 s'il n'y a pas de frais."],
+    sellProfit: ["Profit de l'opération", "La différence entre le montant de la vente (converti dans la devise de base) et le coût de la quantité vendue au coût moyen du stock."]
+  });
+  Object.assign(TIPS.en, {
+    a: ["Purchase amount", "The amount ({bu}) you send to buy USDT. Tap the currency symbol next to the field to pick another of your currencies. The {fee} is added to it."],
+    p: ["Listed price", "Unit price ({bu} per 1 USDT) in the seller's listing. The quantity is worked out as amount ÷ price."],
+    g: ["Target profit", "The profit you want per 1 USDT in the base currency ({gu}). It is converted to the other currencies at the exchange rate, then added to the cost."],
+    topQty: ["USDT quantity", "What you hold in USDT (stock). Every purchase raises it and every sale lowers it; at zero the calculation starts afresh."],
+    topSell: ["Ideal sell price", "The price you should not sell below to reach your profit, based on current stock and in this cell's currency (with its fees). It includes the operation you are typing."],
+    sp: ["Sell price", "Unit sell price in the chosen currency (tap the symbol to change it). The ideal price for that currency appears automatically; you can change it."],
+    ts: ["Sell price (analysis)", "The best sell listing in the chosen currency. The highest buy price that secures your profit is worked out from it."],
+    ta: ["Purchase amount (optional)", "Type your amount in the chosen buy currency to get its target price. Leave empty to see the whole table."],
+    bkf: ["{Fee}", "Transfer fee for this operation ({bu}). The fixed amount from Settings appears automatically; you can type another value. It is part of the cost."],
+    netq: ["Net quantity bought", "The quantity bought (amount ÷ price) after the buy fee. This is what goes into your stock."],
+    curReal: ["Real purchase cost per unit", "What one unit really costs in the buy currency after buy, transfer and sell fees in that same currency. It is the minimum sell price with no profit."],
+    cur: ["Currencies", "Choose the currencies you trade in. Results are shown in each chosen currency; an exchange rate is needed for every currency other than the dinar."],
+    rEUR: ["Euro rate", "How many dinars in 1 €. Used to convert costs and profits between dinar and euro. Change it whenever needed."],
+    rUSD: ["Dollar rate", "How many dinars in 1 $. Used to convert costs and profits between dinar and dollar."],
+    eb: ["Buy fee (euro)", "Percentage the platform takes when buying in euros (0 by default)."],
+    es: ["Sell fee (euro)", "Percentage the platform takes when selling in euros (0 by default)."],
+    ebk: ["Transfer fee (euro)", "A fixed amount added to every euro purchase. Leave it at 0 if there is no fee."],
+    ub: ["Buy fee (dollar)", "Percentage the platform takes when buying in dollars."],
+    us: ["Sell fee (dollar)", "Percentage the platform takes when selling in dollars."],
+    ubk: ["Transfer fee (dollar)", "A fixed amount added to every dollar purchase. Leave it at 0 if there is no fee."],
+    sellProfit: ["Operation profit", "The difference between the sale amount (converted to the base currency) and the cost of the quantity sold at the stock's average cost."]
+  });
+  Object.assign(T.ar, { sw_fee: "احتساب رسوم بريدي موب في الحساب" });
+  Object.assign(T.fr, { sw_fee: "Inclure les frais Baridi Mob dans le calcul" });
+  Object.assign(T.en, { sw_fee: "Include Baridi Mob fee in the calculation" });
+  Object.assign(TIPS.ar, {
+    bm: ["رسوم بريدي موب", "عند التفعيل يُضاف رسم بريدي موب (حسب مجال المبلغ) إلى تكلفة الشراء بالدينار. أوقفه إن لم يكن يُخصم منك."],
+    topReal: ["متوسط التكلفة الفعلية", "متوسط تكلفة الوحدة في المخزون الحالي بالعملة الأساسية، مع رسوم بيعها."]
+  });
+  Object.assign(TIPS.fr, {
+    bm: ["Frais Baridi Mob", "Activé, les frais Baridi Mob (selon la tranche du montant) s'ajoutent au coût des achats en dinars. Désactivez-le s'ils ne vous sont pas facturés."],
+    topReal: ["Coût réel moyen", "Coût moyen par unité du stock actuel dans la devise de base, avec ses frais de vente."]
+  });
+  Object.assign(TIPS.en, {
+    bm: ["Baridi Mob fee", "When on, the Baridi Mob fee (by amount range) is added to the cost of dinar purchases. Turn it off if you are not charged."],
+    topReal: ["Average real cost", "Average cost per unit of the current stock in the base currency, including its sell fee."]
+  });
+
+  Object.assign(T.ar, { top_profit: "الربح الإجمالي", lbl_gD: "الربح المطلوب ({dz})", lbl_gE: "الربح المطلوب (€)", lbl_gU: "الربح المطلوب ($)" });
+  Object.assign(T.fr, { top_profit: "Profit total", lbl_gD: "Profit visé ({dz})", lbl_gE: "Profit visé (€)", lbl_gU: "Profit visé ($)" });
+  Object.assign(T.en, { top_profit: "Total profit", lbl_gD: "Target profit ({dz})", lbl_gE: "Target profit (€)", lbl_gU: "Target profit ($)" });
+  var GTIP = {
+    ar: ["الربح المطلوب", "الربح الذي تريده لكل 1 USDT بهذه العملة. يُضاف إلى تكلفة الوحدة (مع رسوم بيعها) فيعطيك سعر البيع المثالي لها."],
+    fr: ["Profit visé", "Le profit voulu par USDT dans cette devise. Il s'ajoute au coût unitaire (avec ses frais de vente) pour donner son prix de vente idéal."],
+    en: ["Target profit", "The profit you want per 1 USDT in this currency. It is added to the unit cost (with its sell fee) to give its ideal sell price."]
+  };
+  ["ar", "fr", "en"].forEach(function (L) { ["gDZD", "gEUR", "gUSD"].forEach(function (k) { TIPS[L][k] = GTIP[L]; }); });
+  Object.assign(TIPS.ar, { topProfit: ["الربح الإجمالي", "مجموع أرباح عمليات البيع المسجلة بعدد USDT (الربح بالدينار ÷ تكلفة الـ USDT وقت كل بيع)، ليكون التعبير محايدًا. والسطر الصغير تحته هو الربح نفسه بكل عملة بسعر الصرف الحالي."] });
+  Object.assign(TIPS.fr, { topProfit: ["Profit total", "Somme des profits des ventes enregistrées exprimée en USDT (profit en dinars ÷ coût de l'USDT au moment de chaque vente), pour rester neutre. La petite ligne dessous donne le même profit dans chaque devise au taux actuel."] });
+  Object.assign(TIPS.en, { topProfit: ["Total profit", "Sum of the profits of recorded sales expressed in USDT (profit in dinars ÷ cost of the USDT at each sale), to stay neutral. The small line below shows the same profit in each currency at the current rate."] });
+  Object.assign(T.ar, { nav_ops: "العمليات", nav_log: "السجل", nav_target: "السعر المستهدف" });
+  Object.assign(T.fr, { nav_ops: "Opérations", nav_log: "Journal", nav_target: "Prix cible" });
+  Object.assign(T.en, { nav_ops: "Operations", nav_log: "Log", nav_target: "Target price" });
+
+  /* ---------- العملات والرسوم ---------- */
+  var CUR = ["DZD", "EUR", "USD"];
+  var curs = ["DZD"], bcur = "DZD", scur = "DZD", tcb = "DZD", tcs = "DZD";
+  function sym(c) { return c === "EUR" ? "€" : c === "USD" ? "$" : (lang === "ar" ? "دج" : "DA"); }
+  function baseCur() { for (var i = 0; i < CUR.length; i++) if (curs.indexOf(CUR[i]) >= 0) return CUR[i]; return "DZD"; }
+  function feeName() { var k = bcur === "DZD" ? "fee_dz" : "fee_ot"; return (T[lang] && T[lang][k]) || T.ar[k]; }
   function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
-  function fill(s) { return s.replace(/\{Fee\}/g, cap(feeName())).replace(/\{fee\}/g, feeName()).replace(/\{u\}/g, unit()); }
+  function fill(s) {
+    return s.replace(/\{Fee\}/g, cap(feeName())).replace(/\{fee\}/g, feeName())
+      .replace(/\{bu\}/g, sym(bcur)).replace(/\{su\}/g, sym(scur)).replace(/\{tbu\}/g, sym(tcb)).replace(/\{tsu\}/g, sym(tcs))
+      .replace(/\{gu\}/g, sym(baseCur())).replace(/\{dz\}/g, sym("DZD")).replace(/\{u\}/g, sym(baseCur()));
+  }
   function t(key) {
     var s = (T[lang] && T[lang][key]) || T.ar[key] || key, a = arguments;
     s = s.replace(/\{(\d+)\}/g, function (m, i) { return a[+i + 1]; });
     return fill(s);
   }
-  function feeHead() { return curr === "DZD" ? t("th_baridi") : cap(feeName()); }
+  function feeHead() { return bcur === "DZD" ? t("th_baridi") : cap(feeName()); }
 
   /* ---------- أدوات ---------- */
   function num(id) {
@@ -569,28 +861,34 @@
   }
   function baridi(a) { return a <= 10000 ? 12 : a <= 20000 ? 15 : a <= 30000 ? 18 : a <= 40000 ? 21 : 24; }
   function bf(fee) { return baridiOn ? fee : 0; }
-  // رسم التحويل: بريدي موب (حسب المجال) بالدينار، أو مبلغ ثابت لباقي العملات
-  function settingsFee() { var v = num("bk"); return (isNaN(v) || v < 0) ? 0 : v; }
-  function txFee(A) {
-    if (!baridiOn) return 0;
-    if (curr === "DZD") return baridi(A);
-    return settingsFee();
+  function pcv(id) { var v = num(id); return (isNaN(v) || v < 0) ? 0 : v / 100; }
+  function rate(c) { return c === "DZD" ? 1 : num(c === "EUR" ? "rEUR" : "rUSD"); }      // دنانير لكل وحدة
+  function conv(x, from, to) {
+    if (from === to) return x;
+    var rf = rate(from), rt = rate(to);
+    return (rf > 0 && rt > 0) ? x * rf / rt : NaN;
   }
-  // رسم العملية في صفحة الشراء: بريدي موب تلقائي بالدينار، وخانة قابلة للتعديل بالعملات الأخرى
+  function fc(c) {                                                                        // رسوم المنصة: شراء / بيع
+    if (c === "EUR") return { b: pcv("eb"), s: pcv("es") };
+    if (c === "USD") return { b: pcv("ub"), s: pcv("us") };
+    return { b: pcv("fb"), s: pcv("fs") };
+  }
+  function fixedSetting(c) { var v = num(c === "EUR" ? "ebk" : "ubk"); return (isNaN(v) || v < 0) ? 0 : v; }
+  // رسم تحويل عملية الشراء: بريدي موب تلقائي بالدينار، وخانة قابلة للتعديل بالعملات الأخرى
   function buyFee(A) {
-    if (!baridiOn) return 0;
-    if (curr === "DZD") return baridi(A);
+    if (bcur === "DZD") return baridiOn ? baridi(A) : 0;
     if (bfManual) { var v = num("bkf"); if (!isNaN(v) && v >= 0) return v; }
-    return settingsFee();
+    return fixedSetting(bcur);
   }
   function syncBuyFee() {
-    var el = $("bkf"), dz = curr === "DZD";
+    var el = $("bkf"), dz = bcur === "DZD";
     $("bkfBox").hidden = dz;
-    el.disabled = !baridiOn;
-    el.classList.toggle("manual", bfManual && baridiOn);
+    el.classList.toggle("manual", bfManual && !dz);
     if (dz || bfManual || document.activeElement === el) return;
-    el.value = (baridiOn ? settingsFee() : 0).toFixed(2).replace(".", ",");
+    el.value = fixedSetting(bcur).toFixed(2).replace(".", ",");
   }
+  function dec(c) { return c === "DZD" ? 0 : 2; }          // خانات المبالغ
+  function pdec(c) { return c === "DZD" ? 2 : 3; }         // خانات الأسعار
   function fmt(n, d) { return n.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d }); }
   function sgn(n, d) { return (n >= 0 ? "+" : "") + fmt(n, d); }
   function row(k, v, cls) { return '<div class="row"><dt>' + k + '</dt><dd' + (cls ? ' class="' + cls + '"' : "") + '>' + v + '</dd></div>'; }
@@ -612,55 +910,93 @@
   var lastAdded = null;
   function nowTime() { var d = new Date(); return ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2); }
 
-  /* ---------- إحصاءات مشتركة ---------- */
-  function purchaseStats(withPending) {
-    var inc = ops.filter(function (o) { return o.type === "buy" && o.inc; });
-    var cost = 0, q2 = 0, sellW = 0, n = inc.length;
-    inc.forEach(function (o) { cost += o.A + o.F; q2 += o.Q2; sellW += o.minSell * o.Q2; });
-    if (withPending && last) { cost += last.A + last.F; q2 += last.Q2; sellW += last.minSell * last.Q2; n++; }
-    if (!n) return null;
-    return { n: n, cost: cost, q2: q2, avgReal: cost / q2, avgSell: sellW / q2 };
+  /* ---------- المخزون: كمية USDT وتكلفتها (متوسط متحرك) ---------- */
+  // كل شراء يضيف كمية وتكلفة، وكل بيع ينقص الكمية بنفس متوسط التكلفة. عند الصفر يبدأ الحساب من جديد.
+  var QEPS = 0.0005;                       // تقريب الكمية إلى 4 خانات عشرية: ما دونه يُعدّ صفرًا
+  function inventory(withPending) {
+    var S = 0, C = 0;
+    ops.forEach(function (o) {
+      if (o.type === "buy") { if (o.inc) { S += o.H; C += o.costB; } }
+      else if (o.type === "sell") {
+        if (S > 1e-9) { var take = o.q >= S - QEPS ? S : o.q; C -= C * (take / S); S -= take; }
+        if (S < QEPS) { S = 0; C = 0; }
+      }
+    });
+    if (withPending && last) { S += last.H; C += last.costB; }
+    return { S: S, C: C, avg: S > 0 ? C / S : null };
+  }
+  // الربح المطلوب لكل 1 USDT بعملة c (خانة مستقلة لكل عملة)
+  function gOf(c) { var v = num("g" + c); return isNaN(v) ? 0 : v; }
+  // سعر البيع المثالي بعملة c = متوسط التكلفة (محوَّلًا إلى c) ÷ (1 - رسوم بيع c) + ربح c
+  function idealPrice(avgB, c) {
+    var s = fc(c).s, avgC = conv(avgB, baseCur(), c);
+    if (!isFinite(avgC) || avgC < 0 || s >= 1) return NaN;
+    var v = avgC / (1 - s) + gOf(c);
+    var m = Math.pow(10, pdec(c));
+    return Math.ceil(v * m - 1e-9) / m;       // يُقرَّب للأعلى حتى لا ينقص الربح عن المطلوب
+  }
+  // الربح الإجمالي: بعدد USDT (الربح بالدينار ÷ تكلفة الـ USDT وقت كل بيع)، ومعه تقديره بكل عملة
+  function totals() {
+    var base = baseCur(), usdt = 0, pb = 0, has = false, per = {};
+    ops.forEach(function (o) {
+      if (o.type === "sell" && o.profit !== null && o.profit !== undefined) {
+        has = true; pb += o.profit;
+        var avg = o.q > 0 ? o.costB / o.q : 0;
+        if (avg > 0) usdt += o.profit / avg;
+      }
+    });
+    curs.forEach(function (c) { per[c] = conv(pb, base, c); });
+    return { has: has, usdt: usdt, base: pb, per: per };
+  }
+  function profitSub(tt) {
+    return "≈ " + curs.map(function (c) { return isFinite(tt.per[c]) ? sgn(tt.per[c], dec(c)) + " " + sym(c) : "—"; }).join(" · ");
   }
   function updateTop() {
-    var st = purchaseStats(true);
-    setVal("topReal", st ? fmt(st.avgReal, 2) : "—");
-    setVal("topSell", st ? fmt(st.avgSell, 2) : "—");
-  }
-  function soldTotal() {
-    return ops.reduce(function (s, o) { return o.type === "sell" ? s + o.q : s; }, 0);
+    var inv = inventory(true), tt = totals();
+    $("topbar").setAttribute("data-n", String(curs.length));
+    setVal("topQ", fmt(inv.S, 2));
+    setVal("topProfit", tt.has ? sgn(tt.usdt, 2) : "—");
+    $("topProfitSub").textContent = tt.has ? profitSub(tt) : "";
+    var cell = $("cTot");
+    cell.classList.remove("c3", "c4", "c5");
+    cell.classList.add(!tt.has ? "c3" : tt.base >= 0 ? "c4" : "c5");
+    CUR.forEach(function (c) {
+      var box = $("col_" + c);
+      box.hidden = curs.indexOf(c) < 0;
+      if (box.hidden) return;
+      var v = inv.avg !== null ? idealPrice(inv.avg, c) : NaN;
+      setVal("topP_" + c, isFinite(v) ? fmt(v, pdec(c)) : "—");
+    });
   }
 
   /* ---------- صفحة الشراء ---------- */
   function calc() {
-    var A = num("a"), P = num("p"), g = num("g"), fb = num("fb"), fs = num("fs");
+    var A = num("a"), P = num("p");
     if (isNaN(A) || isNaN(P) || A <= 0 || P <= 0) {
       last = null;
-      setVal("curReal", "—");
-      setVal("netQ", "—");
+      setVal("curReal", "—"); setVal("netQ", "—");
       updateTop();
       $("save").disabled = true;
       return;
     }
-    if (isNaN(g)) g = 0; if (isNaN(fb)) fb = 0; if (isNaN(fs)) fs = 0;
-    fb /= 100; fs /= 100;
-    var F = buyFee(A);
-    var Q = A / P;
-    var Q1 = Q * (1 - fb);
-    var Q2 = Q1 - Q * fs;
-    var real = (A + F) / Q2;
-    var minSell = real + g;
-    last = { A: A, P: P, g: g, Q: Q, Q1: Q1, Q2: Q2, F: F, real: real, minSell: minSell };
-    setVal("curReal", fmt(real, 2));
-    setVal("netQ", fmt(Q2, 4));
+    var f = fc(bcur), F = buyFee(A), Q = A / P, H = Q * (1 - f.b);
+    var k = conv(1, bcur, baseCur()), costB = (A + F) * k;
+    var real = (A + F) / (H * (1 - f.s));
+    var ok = isFinite(costB) && isFinite(real) && H > 0;
+    last = ok ? { cur: bcur, A: A, P: P, F: F, fbr: f.b, Q: Q, H: H, k: k, costB: costB, real: real } : null;
+    setVal("curReal", isFinite(real) ? fmt(real, pdec(bcur)) : "—");
+    setVal("netQ", H > 0 ? fmt(H, 4) : "—");
     updateTop();
-    $("save").disabled = false;
+    $("save").disabled = !last;
   }
-  ["a", "p", "fb", "fs", "g", "bk", "bkf"].forEach(function (id) {
-    $(id).addEventListener("input", calc);
+  function recalcAll() { syncBuyFee(); calc(); refreshSell(); calcTarget(); }
+  ["a", "p"].forEach(function (id) { $(id).addEventListener("input", calc); });
+  ["fb", "fs", "eb", "es", "ebk", "ub", "us", "ubk", "rEUR", "rUSD"].forEach(function (id) { $(id).addEventListener("input", recalcAll); });
+  ["gDZD", "gEUR", "gUSD"].forEach(function (id) {
+    $(id).addEventListener("input", function () { calc(); refreshSell(); calcTarget(); persist(); });
   });
   $("bkf").addEventListener("input", function () { bfManual = this.value.trim() !== ""; syncBuyFee(); calc(); });
   $("bkf").addEventListener("blur", function () { syncBuyFee(); calc(); });
-  $("bk").addEventListener("input", function () { syncBuyFee(); calc(); });
 
   $("save").addEventListener("click", function () {
     if (!last) return;
@@ -683,22 +1019,25 @@
     el.value = val === null ? "" : val.toFixed(digits).replace(".", ",");
   }
   function refreshSell() {
-    var st = purchaseStats();
-    var remain = st ? Math.max(st.q2 - soldTotal(), 0) : null;
-    setSellField("sq", remain, 4);
-    setSellField("sp", st ? st.avgSell : null, 2);
-
-    var q = num("sq"), p = num("sp"), out = $("sout");
-    if (isNaN(q) || isNaN(p) || q <= 0 || p <= 0) { out.innerHTML = ""; $("ssave").disabled = true; return; }
-    var rev = q * p, u = unit();
-    var html = '<div class="panel"><dl>' + row(t("sell_amount"), fmt(rev, 0) + " " + u);
-    if (st) {
-      var cost = q * st.avgReal, profit = rev - cost, perUnit = p - st.avgReal;
-      html += row(t("sell_cost", fmt(st.avgReal, 2)), fmt(cost, 0) + " " + u) +
-        row(t("sell_profit"), sgn(profit, 0) + " " + u + " (" + sgn(perUnit, 2) + " /USDT)", profit >= 0 ? "gain" : "loss");
+    var inv = inventory(false), c = scur, base = baseCur();
+    setSellField("sq", inv.S > 0 ? inv.S : null, 4);
+    var ip = inv.avg !== null ? idealPrice(inv.avg, c) : NaN;
+    setSellField("sp", isFinite(ip) ? ip : null, pdec(c));
+    $("sAmtU").textContent = sym(c); $("sProfU").textContent = sym(base);
+    var q = num("sq"), p = num("sp"), pc = $("sProfitCell");
+    pc.classList.remove("gain", "loss");
+    if (isNaN(q) || isNaN(p) || q <= 0 || p <= 0 || q > inv.S + QEPS) {
+      setVal("sAmt", "—"); setVal("sProfit", "—"); $("ssave").disabled = true; return;
     }
-    out.innerHTML = html + "</dl></div>";
-    $("ssave").disabled = false;
+    q = Math.min(q, inv.S);
+    var rev = q * p * (1 - fc(c).s), revB = conv(rev, c, base);
+    setVal("sAmt", fmt(rev, dec(c)));
+    if (inv.avg !== null && isFinite(revB)) {
+      var profit = revB - q * inv.avg;
+      setVal("sProfit", sgn(profit, 2));
+      pc.classList.add(profit >= 0 ? "gain" : "loss");
+      $("ssave").disabled = false;
+    } else { setVal("sProfit", "—"); $("ssave").disabled = true; }
   }
   ["sq", "sp"].forEach(function (k) {
     var el = $(k);
@@ -706,12 +1045,13 @@
     el.addEventListener("blur", refreshSell);
   });
   $("ssave").addEventListener("click", function () {
-    var q = num("sq"), p = num("sp");
-    if (isNaN(q) || isNaN(p) || q <= 0 || p <= 0) return;
-    var st = purchaseStats();
-    var cost = st ? q * st.avgReal : null;
-    ops.push({ type: "sell", n: ++counter, t: nowTime(), q: q, p: p, rev: q * p,
-      avgReal: st ? st.avgReal : null, cost: cost, profit: cost === null ? null : q * p - cost });
+    var inv = inventory(false), q = num("sq"), p = num("sp"), c = scur, base = baseCur();
+    if (isNaN(q) || isNaN(p) || q <= 0 || p <= 0 || inv.avg === null || q > inv.S + QEPS) return;
+    q = Math.min(q, inv.S);
+    var s = fc(c).s, rev = q * p * (1 - s), revB = conv(rev, c, base);
+    if (!isFinite(revB)) return;
+    var costB = q * inv.avg;
+    ops.push({ type: "sell", n: ++counter, t: nowTime(), cur: c, q: q, p: p, s: s, rev: rev, revB: revB, costB: costB, profit: revB - costB });
     lastAdded = counter;
     toast(t("toast_sell"));
     sManual.sq = sManual.sp = false;
@@ -720,59 +1060,76 @@
   });
 
   /* ---------- السجل المشترك ---------- */
+  function suf(c) { return curs.length > 1 ? " " + sym(c || "DZD") : ""; }
   function headCells() { return ["#", t("c_type"), t("c_time"), t("c_amount"), t("c_price"), t("c_net"), t("c_profit")]; }
   function cells(o) {
+    var c = o.cur || "DZD";
     if (o.type === "buy")
-      return [o.n, t("buy"), o.t, fmt(o.A, 0), fmt(o.real, 2), fmt(o.Q2, 4), "-"];
-    return [o.n, t("sell"), o.t, fmt(o.rev, 0), fmt(o.p, 2), fmt(o.q, 4),
-      o.profit === null ? "-" : sgn(o.profit, 0)];
+      return [o.n, t("buy"), o.t, fmt(o.A, dec(c)) + suf(c), fmt(o.real, pdec(c)) + suf(c), fmt(o.H, 4), "-"];
+    return [o.n, t("sell"), o.t, fmt(o.rev, dec(c)) + suf(c), fmt(o.p, pdec(c)) + suf(c), fmt(o.q, 4),
+      (o.profit === null || o.profit === undefined) ? "-" : sgn(o.profit, 0) + suf(baseCur())];
   }
   function copyHead() {
     return ["#", t("c_type"), t("c_time"), t("c_amount"), t("c_listed"), t("c_bought"), t("c_afterbuy"), t("c_net"), feeHead(), t("c_price"), t("c_profit")];
   }
   function copyCells(o) {
+    var c = o.cur || "DZD";
     if (o.type === "buy")
-      return [o.n, t("buy"), o.t, fmt(o.A, 0), fmt(o.P, 2), fmt(o.Q, 4), fmt(o.Q1, 4), fmt(o.Q2, 4), fmt(o.F, 2), fmt(o.real, 2), "-"];
-    return [o.n, t("sell"), o.t, fmt(o.rev, 0), fmt(o.p, 2), "-", "-", fmt(o.q, 4), "-",
-      fmt(o.p, 2), o.profit === null ? "-" : fmt(o.profit, 0)];
+      return [o.n, t("buy"), o.t, fmt(o.A, dec(c)) + " " + c, fmt(o.P, pdec(c)), fmt(o.Q, 4), fmt(o.H, 4), fmt(o.H, 4), fmt(o.F, 2), fmt(o.real, pdec(c)), "-"];
+    return [o.n, t("sell"), o.t, fmt(o.rev, dec(c)) + " " + c, fmt(o.p, pdec(c)), "-", "-", fmt(o.q, 4), "-",
+      fmt(o.p, pdec(c)), (o.profit === null || o.profit === undefined) ? "-" : fmt(o.profit, 0)];
   }
 
   function renderSummary() {
-    var box = $("sum");
-    var st = purchaseStats(), sold = soldTotal();
+    var box = $("sum"), inv = inventory(false), base = baseCur(), tt = totals();
     updateTop();
-    var profit = 0, hasP = false;
-    ops.forEach(function (o) { if (o.type === "sell" && o.profit !== null) { profit += o.profit; hasP = true; } });
-    if (!st && !hasP) { box.innerHTML = ""; return; }
-    function cell(cls, name, val, unitTxt, key) {
-      return '<div class="cell ' + cls + '"><div class="name"><button type="button" class="info" data-tip="' + key + '" aria-label="' + t("explain") + '">!</button>' + name + '</div><div class="val">' + val +
-        (unitTxt ? ' <span class="unit">' + unitTxt + '</span>' : "") + "</div></div>";
+    if (!ops.length) { box.innerHTML = ""; return; }
+    function cell(cls, name, val, unitTxt, key, sub) {
+      return '<div class="cell ' + cls + '"><div class="name">' + name + '<button type="button" class="info" data-tip="' + key + '" aria-label="' + t("explain") + '">!</button></div><div class="val">' + val +
+        (unitTxt ? ' <span class="unit">' + unitTxt + '</span>' : "") + (sub ? '<div class="subv">' + sub + '</div>' : "") + "</div></div>";
     }
+    var avgReal = inv.avg !== null ? inv.avg / (1 - fc(base).s) : null;
     box.innerHTML = '<div class="cells">' +
-      cell("c3", t("remain"), st ? fmt(Math.max(st.q2 - sold, 0), 2) : "—", "USDT", "remain") +
-      cell(hasP ? (profit >= 0 ? "c4" : "c5") : "c3", t("profit"), hasP ? sgn(profit, 2) : "—", unit(), "profit") +
+      cell("c3", t("top_real"), avgReal !== null && isFinite(avgReal) ? fmt(avgReal, pdec(base)) : "—", sym(base), "topReal") +
+      cell(!tt.has ? "c3" : tt.base >= 0 ? "c4" : "c5", t("top_profit"), tt.has ? sgn(tt.usdt, 2) : "—", "USDT", "topProfit", tt.has ? profitSub(tt) : "") +
       "</div>";
   }
 
+  /* ---------- الحفظ والاسترجاع ---------- */
   var STORE_KEY = "p2p-usdt-v1";
+  var FIELDS = ["gDZD", "gEUR", "gUSD", "fb", "fs", "eb", "es", "ebk", "ub", "us", "ubk", "rEUR", "rUSD"];
   function persist() {
     try {
-      localStorage.setItem(STORE_KEY, JSON.stringify({ ops: ops, counter: counter, g: $("g").value, fb: $("fb").value, fs: $("fs").value,
-        bk: $("bk").value, bm: baridiOn, lang: lang, cur: curr }));
+      var d = { ops: ops, counter: counter, bm: baridiOn, lang: lang, curs: curs, bcur: bcur, scur: scur, tcb: tcb, tcs: tcs };
+      FIELDS.forEach(function (id) { d["f_" + id] = $(id).value; });
+      localStorage.setItem(STORE_KEY, JSON.stringify(d));
     } catch (e) {}
+  }
+  function migrate(o) {                       // سجلات النسخ القديمة (دينار فقط)
+    if (o.type === "buy" && o.H === undefined) {
+      o.cur = o.cur || "DZD";
+      o.H = o.Q2 !== undefined ? o.Q2 : (o.Q1 !== undefined ? o.Q1 : o.Q);
+      o.costB = o.A + (o.F || 0); o.k = 1; o.fbr = o.fbr || 0;
+    } else if (o.type === "sell" && o.cur === undefined) {
+      o.cur = "DZD"; o.costB = o.cost; o.revB = o.rev;
+    }
+    return o;
   }
   function restore() {
     try {
       var d = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
       if (!d) return;
-      ops = d.ops || []; counter = d.counter || 0;
-      if (d.g) $("g").value = d.g;
-      if (d.fb) $("fb").value = d.fb;
-      if (d.fs) $("fs").value = d.fs;
-      if (d.bk) $("bk").value = d.bk;
+      ops = (d.ops || []).map(migrate); counter = d.counter || 0;
+      FIELDS.forEach(function (id) {
+        var v = d["f_" + id]; if (v === undefined) v = d[id];
+        if (v !== undefined && v !== null) $(id).value = v;
+      });
+      if (d.f_gDZD === undefined) { var og = d.f_g !== undefined ? d.f_g : d.g; if (og !== undefined) $("gDZD").value = og; }
       baridiOn = d.bm !== false;
       if (d.lang && T[d.lang]) lang = d.lang;
-      if (d.cur) curr = d.cur;
+      if (d.curs && d.curs.length) curs = CUR.filter(function (c) { return d.curs.indexOf(c) >= 0; });
+      if (!curs.length) curs = ["DZD"];
+      if (d.bcur) bcur = d.bcur; if (d.scur) scur = d.scur; if (d.tcb) tcb = d.tcb; if (d.tcs) tcs = d.tcs;
     } catch (e) {}
   }
 
@@ -796,7 +1153,7 @@
         else {
           var cls = "n";
           if (j === 4 || j === 6) cls += " key";
-          if (j === 6 && !isBuy && o.profit !== null) cls += o.profit >= 0 ? " gain" : " loss";
+          if (j === 6 && !isBuy && o.profit !== null && o.profit !== undefined) cls += o.profit >= 0 ? " gain" : " loss";
           h += '<td class="' + cls + '">' + v + "</td>";
         }
       });
@@ -855,14 +1212,58 @@
     });
   });
 
+  /* ---------- اختيار العملة بجانب الخانة ---------- */
+  var CTX = { a: "buy", sp: "sell", ts: "tsell", ta: "tbuy" };
+  var PRICEF = { p: "buy", sp: "sell", ts: "tsell" };
+  function getCtx(k) { return k === "buy" ? bcur : k === "sell" ? scur : k === "tsell" ? tcs : tcb; }
+  function setCtx(k, c) { if (k === "buy") bcur = c; else if (k === "sell") scur = c; else if (k === "tsell") tcs = c; else tcb = c; }
+  function fixSel() {
+    var b = baseCur();
+    if (curs.indexOf(bcur) < 0) bcur = b;
+    if (curs.indexOf(scur) < 0) scur = b;
+    if (curs.indexOf(tcb) < 0) tcb = b;
+    if (curs.indexOf(tcs) < 0) tcs = b;
+  }
+  function updateCurUI() {
+    Array.prototype.forEach.call(document.querySelectorAll(".curbtn"), function (b) {
+      b.textContent = sym(getCtx(b.getAttribute("data-ctx"))) + "▾";
+      b.hidden = curs.length < 2;
+      b.setAttribute("aria-label", t("cur_switch"));
+    });
+  }
+  function refreshTexts() {
+    Array.prototype.forEach.call(document.querySelectorAll("[data-i18n]"), function (el) {
+      el.textContent = t(el.getAttribute("data-i18n"));
+    });
+    Array.prototype.forEach.call(document.querySelectorAll("[data-cursym]"), function (el) {
+      el.textContent = sym(el.getAttribute("data-cursym"));
+    });
+    $("curRealU").textContent = sym(bcur); $("sAmtU").textContent = sym(scur);
+    $("sProfU").textContent = sym(baseCur()); $("tU").textContent = sym(tcb);
+    updateCurUI();
+  }
+  function cycleCur(k) {
+    var i = curs.indexOf(getCtx(k));
+    setCtx(k, curs[(i + 1) % curs.length]);
+    if (k === "buy") bfManual = false;
+    if (k === "sell") sManual.sp = false;
+    refreshTexts(); syncBuyFee(); calc(); refreshSell(); calcTarget(); persist();
+  }
+
   /* ---------- أزرار الزيادة والإنقاص ---------- */
-  var STEPS = { a: 0.01, p: 0.01, g: 0.01, fb: 0.1, fs: 0.1, sq: 0.01, sp: 0.01, ts: 0.01, ta: 0.01, bk: 0.01, bkf: 0.01 };
-  var DEC = { a: 2, p: 2, g: 2, fb: 1, fs: 1, sq: 2, sp: 2, ts: 2, ta: 2, bk: 2, bkf: 2 };
+  var STEPS = { a: 0.01, p: 0.01, gDZD: 0.01, gEUR: 0.001, gUSD: 0.001, fb: 0.1, fs: 0.1, eb: 0.1, es: 0.1, ebk: 0.01, ub: 0.1, us: 0.1, ubk: 0.01,
+    rEUR: 0.1, rUSD: 0.1, sq: 0.01, sp: 0.01, ts: 0.01, ta: 0.01, bkf: 0.01 };
+  var DEC = { a: 2, p: 2, gDZD: 2, gEUR: 3, gUSD: 3, fb: 1, fs: 1, eb: 1, es: 1, ebk: 2, ub: 1, us: 1, ubk: 2, rEUR: 2, rUSD: 2, sq: 2, sp: 2, ts: 2, ta: 2, bkf: 2 };
+  function stepInfo(id) {
+    var st = STEPS[id], d = DEC[id];
+    if (PRICEF[id] && getCtx(PRICEF[id]) !== "DZD") { st = 0.001; d = 3; }
+    return { st: st, d: d };
+  }
   function stepField(id, dir) {
-    var el = $(id), cur = num(id);
+    var el = $(id), cur = num(id), si = stepInfo(id);
     if (isNaN(cur)) cur = 0;
-    var v = Math.max(0, Math.round((cur + dir * STEPS[id]) * 1e4) / 1e4);
-    el.value = v.toFixed(DEC[id]).replace(".", ",");
+    var v = Math.max(0, Math.round((cur + dir * si.st) * 1e4) / 1e4);
+    el.value = v.toFixed(si.d).replace(".", ",");
     el.dispatchEvent(new Event("input", { bubbles: true }));
   }
   Object.keys(STEPS).forEach(function (id) {
@@ -891,6 +1292,12 @@
     col.appendChild(mk(false));
     wrap.appendChild(col);
     wrap.appendChild(el);
+    if (CTX[id]) {
+      var cb = document.createElement("button");
+      cb.type = "button"; cb.className = "curbtn"; cb.setAttribute("data-ctx", CTX[id]);
+      cb.addEventListener("click", function () { cycleCur(CTX[id]); });
+      wrap.appendChild(cb);
+    }
   });
 
   /* ---------- سعر الشراء المستهدف ---------- */
@@ -904,75 +1311,111 @@
   var REF = [100, 500, 1000, 5000, 10000];
   function rangeLabel(b) { return b.hi === Infinity ? fmt(b.lo, 0) + " " + t("and_above") : fmt(b.lo, 0) + " – " + fmt(b.hi, 0); }
   function floor2(x) { return Math.floor(x * 100 + 1e-9) / 100; }
-  function targetPrice(S, g, A, F, k) { return floor2((S - g) * k / (1 + F / A)); }
+  function floor3(x) { return Math.floor(x * 1000 + 1e-9) / 1000; }
 
   function renderBmTable() {
     var h = "";
-    BR.forEach(function (b) { h += "<tr><td>" + rangeLabel(b) + "</td><td>" + b.fee + " " + unit() + "</td></tr>"; });
+    BR.forEach(function (b) { h += "<tr><td>" + rangeLabel(b) + "</td><td>" + b.fee + " " + sym("DZD") + "</td></tr>"; });
     $("bmBody").innerHTML = h;
   }
 
+  function setTarget(v) {
+    setVal("tVal", v === null ? "—" : fmt(v, pdec(tcb)));
+    $("tCopy").setAttribute("data-v", v === null ? "" : v.toFixed(pdec(tcb)));
+  }
   function calcTarget() {
-    var S = num("ts"), A = num("ta"), g = num("g"), fb = num("fb"), fs = num("fs"), out = $("tout");
-    if (isNaN(S) || S <= 0) { out.innerHTML = ""; return; }
-    if (isNaN(g)) g = 0; if (isNaN(fb)) fb = 0; if (isNaN(fs)) fs = 0;
-    var k = 1 - fb / 100 - fs / 100;
-    var html = "", u = unit(), hasA = !isNaN(A) && A > 0;
-    if (curr === "DZD") {
+    var S = num("ts"), A = num("ta"), g = gOf(tcs), out = $("tout"), base = baseCur();
+    $("tU").textContent = sym(tcb);
+    if (isNaN(S) || S <= 0) { out.innerHTML = ""; setTarget(null); return; }
+    var Sb = conv(S, tcs, base), gB = conv(g, tcs, base), kb = conv(1, tcb, base), ss = fc(tcs).s, fb = fc(tcb).b;
+    if (!isFinite(Sb) || !isFinite(gB) || !isFinite(kb)) { out.innerHTML = ""; setTarget(null); return; }
+    var fl = tcb === "DZD" ? floor2 : floor3;
+    // أعلى سعر شراء (بعملة الشراء) يحقق الربح عند البيع بسعر S: التكلفة المسموحة للوحدة = (S - الربح) × (1 - رسوم البيع)
+    function tpf(Amt, F) { return fl((Sb - gB) * (1 - ss) * (1 - fb) / (kb * (1 + F / Amt))); }
+    var html = "", hasA = !isNaN(A) && A > 0, tp = null, pd = pdec(tcb);
+    if (tcb === "DZD") {
       var cur = -1;
       if (hasA) {
         for (var i = 0; i < BR.length; i++) { if (A <= BR[i].hi) { cur = i; break; } }
-        var tp = targetPrice(S, g, A, bf(BR[cur].fee), k);
-        html += '<div class="res b"><button type="button" class="copy-btn" data-v="' + tp.toFixed(2) + '" aria-label="' + t("copy_value") + '">' + COPY_ICON + '</button>' +
-          '<div class="name">' + t("t_buy_at", fmt(A, 0)) + '</div>' +
-          '<div class="big">' + fmt(tp, 2) + ' <span class="unit">' + u + '</span></div></div>';
+        tp = tpf(A, bf(BR[cur].fee));
       }
       html += '<div class="panel"><div class="scroll"><table><thead><tr><th>' + t("th_range") + '</th><th>' + t("th_fee_short") + '</th>' +
         '<th>' + t("th_low") + '</th><th>' + t("th_high") + '</th></tr></thead><tbody>';
       BR.forEach(function (b, i) {
         html += '<tr' + (i === cur ? ' class="cur"' : "") + '><td>' + rangeLabel(b) + '</td><td class="n">' + bf(b.fee) + '</td>' +
-          '<td class="n key">' + fmt(targetPrice(S, g, b.low, bf(b.fee), k), 2) + '<span class="sub">' + fmt(b.low, 0) + '</span></td>' +
-          '<td class="n key">' + fmt(targetPrice(S, g, b.high, bf(b.fee), k), 2) + '<span class="sub">' + fmt(b.high, 0) + '</span></td></tr>';
+          '<td class="n key">' + fmt(tpf(b.low, bf(b.fee)), pd) + '<span class="sub">' + fmt(b.low, 0) + '</span></td>' +
+          '<td class="n key">' + fmt(tpf(b.high, bf(b.fee)), pd) + '<span class="sub">' + fmt(b.high, 0) + '</span></td></tr>';
       });
       html += '</tbody></table></div></div>';
     } else {
-      var fx = txFee(1);
-      if (hasA) {
-        var tpx = targetPrice(S, g, A, fx, k);
-        html += '<div class="res b"><button type="button" class="copy-btn" data-v="' + tpx.toFixed(2) + '" aria-label="' + t("copy_value") + '">' + COPY_ICON + '</button>' +
-          '<div class="name">' + t("t_buy_at", fmt(A, 2)) + '</div>' +
-          '<div class="big">' + fmt(tpx, 2) + ' <span class="unit">' + u + '</span></div></div>';
-      }
+      var fx = fixedSetting(tcb);
+      if (hasA) tp = tpf(A, fx);
       html += '<div class="panel"><div class="scroll"><table><thead><tr><th>' + t("th_amount") + '</th><th>' + t("th_fee_short") + '</th>' +
         '<th>' + t("th_target") + '</th></tr></thead><tbody>';
       REF.forEach(function (r) {
-        html += '<tr><td class="n">' + fmt(r, 0) + '</td><td class="n">' + fmt(fx, 2) + '</td><td class="n key">' + fmt(targetPrice(S, g, r, fx, k), 2) + '</td></tr>';
+        html += '<tr><td class="n">' + fmt(r, 0) + '</td><td class="n">' + fmt(fx, 2) + '</td><td class="n key">' + fmt(tpf(r, fx), pd) + '</td></tr>';
       });
       html += '</tbody></table></div></div>';
     }
     out.innerHTML = html;
+    setTarget(tp);
   }
-  ["ts", "ta", "g", "fb", "fs", "bk"].forEach(function (id) { $(id).addEventListener("input", calcTarget); });
-  $("g").addEventListener("input", persist);
+  ["ts", "ta"].forEach(function (id) { $(id).addEventListener("input", calcTarget); });
 
   /* ---------- التبويبات ---------- */
-  var PAGES = { buy: ["pageBuy", "tabBuy"], sell: ["pageSell", "tabSell"], target: ["pageTarget", "tabTarget"] };
+  var PAGES = { buy: ["pageBuy", "tabBuy", "ftabBuy"], sell: ["pageSell", "tabSell", "ftabSell"] };
+  var ORDER = ["buy", "sell"];
+  var swapTimer = null, swapOut = null, swapIn = null;
+  function finishSwap() {
+    clearTimeout(swapTimer); swapTimer = null;
+    if (swapOut) { swapOut.hidden = true; swapOut.classList.remove("going"); swapOut = null; }
+    if (swapIn) { swapIn.classList.remove("coming"); swapIn = null; }
+  }
   function showPage(name) {
-    var idx = 0;
-    Object.keys(PAGES).forEach(function (k, i) {
+    finishSwap();
+    var cur = null;
+    ORDER.forEach(function (k) { if (!$(PAGES[k][0]).hidden) cur = k; });
+    ORDER.forEach(function (k) {
       var on = k === name;
-      if (on) idx = i;
-      $(PAGES[k][0]).hidden = !on;
       $(PAGES[k][1]).setAttribute("aria-selected", on);
+      $(PAGES[k][2]).classList.toggle("active", on);
     });
-    $("tabs").style.setProperty("--idx", idx);
-    animateIn($(PAGES[name][0]));
+    var inn = $(PAGES[name][0]);
+    if (cur && cur !== name) {
+      var out = $(PAGES[cur][0]);
+      if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        out.hidden = true; inn.hidden = false;
+      } else {
+        // الصفحة الجديدة تصعد إلى الواجهة، والسابقة تنزل خلفها كملف مغطّى
+        inn.hidden = false;
+        out.classList.add("going"); inn.classList.add("coming");
+        swapOut = out; swapIn = inn;
+        swapTimer = setTimeout(finishSwap, 420);
+      }
+    } else { inn.hidden = false; }
     if (name === "sell") refreshSell();
-    if (name === "target") calcTarget();
   }
   $("tabBuy").addEventListener("click", function () { showPage("buy"); });
   $("tabSell").addEventListener("click", function () { showPage("sell"); });
-  $("tabTarget").addEventListener("click", function () { showPage("target"); });
+
+  /* ---------- الصفحات الرئيسية: العمليات / السجل / السعر المستهدف ---------- */
+  var VIEWS = { ops: ["viewOps", "navOps"], log: ["viewLog", "navLog"], target: ["viewTarget", "navTarget"] };
+  function showView(name) {
+    hideTip(); closeMenu();
+    Object.keys(VIEWS).forEach(function (k) {
+      var on = k === name;
+      $(VIEWS[k][0]).hidden = !on;
+      $(VIEWS[k][1]).setAttribute("aria-selected", on);
+    });
+    $("topbar").hidden = name === "log";
+    animateIn($(VIEWS[name][0]));
+    if (window.scrollTo) window.scrollTo(0, 0);
+    if (name === "target") calcTarget();
+    if (name === "ops") refreshSell();
+  }
+  Object.keys(VIEWS).forEach(function (k) {
+    $(VIEWS[k][1]).addEventListener("click", function () { showView(k); });
+  });
 
   /* ---------- أيقونات الشرح (!) ---------- */
   function mkInfo(key) {
@@ -981,32 +1424,30 @@
     b.setAttribute("aria-label", "شرح"); b.textContent = "!";
     return b;
   }
-  function addInfo(el, key, before) {
+  function addInfo(el, key) {
     if (!el) return;
-    el.insertBefore(mkInfo(key), before || el.firstChild);
+    el.appendChild(mkInfo(key));
   }
-  ["a", "p", "g", "sq", "sp", "ts", "ta", "fb", "fs", "bk", "bkf"].forEach(function (id) {
+  ["a", "p", "gDZD", "gEUR", "gUSD", "sq", "sp", "ts", "ta", "fb", "fs", "eb", "es", "ebk", "ub", "us", "ubk", "rEUR", "rUSD", "bkf"].forEach(function (id) {
     addInfo(document.querySelector('label[for="' + id + '"]'), id);
   });
   addInfo($("netqLabel"), "netq");
-  addInfo(document.querySelector(".tb.a .name"), "topReal");
-  addInfo(document.querySelector(".tb.b .name"), "topSell");
+  addInfo($("sAmtName"), "sellAmt");
+  addInfo($("sProfitName"), "sellProfit");
+  addInfo($("tName"), "tRes");
+  addInfo($("qtyName"), "topQty");
+  addInfo($("totName"), "topProfit");
+  Array.prototype.forEach.call(document.querySelectorAll(".pname"), function (n) { addInfo(n, "topSell"); });
   addInfo(document.querySelector(".res.a .name"), "curReal");
-  addInfo(document.querySelector("label.switch"), "bm", document.querySelector("label.switch .slider"));
+  addInfo(document.querySelector("label.switch"), "bm");
   (function () {
     var btn = $("settingsBtn"), w = document.createElement("div");
     w.className = "headact";
     btn.parentNode.insertBefore(w, btn);
-    w.appendChild(mkInfo("settings"));
     w.appendChild(btn);
+    w.appendChild(mkInfo("settings"));
   })();
-  ["tabBuy", "tabSell", "tabTarget"].forEach(function (id) {
-    var b = $(id), w = document.createElement("div");
-    w.className = "tabcell";
-    b.parentNode.insertBefore(w, b);
-    w.appendChild(b);
-    w.appendChild(mkInfo(id));
-  });
+  ["tabBuy", "tabSell"].forEach(function (id) { $(id).parentNode.appendChild(mkInfo(id)); });
 
   var tipBtn = null;
   function hideTip() {
@@ -1070,21 +1511,30 @@
 
   /* --- صفحة التعديل (مسودة: لا يُثبَّت شيء إلا بزر «حفظ») --- */
   var SEC = { fees: ["secFees", "menu_fees"], cur: ["secCur", "menu_cur"], lang: ["secLang", "menu_lang"] };
-  var snap = null, curSec = null, draftCur = "DZD", draftLang = "ar";
+  var SNAPF = ["fb", "fs", "eb", "es", "ebk", "ub", "us", "ubk", "rEUR", "rUSD"];
+  var snap = null, curSec = null, draftCurs = ["DZD"], draftLang = "ar";
+  function multiUI() {
+    Array.prototype.forEach.call($("curSeg").querySelectorAll("button"), function (b) {
+      b.setAttribute("aria-pressed", draftCurs.indexOf(b.getAttribute("data-v")) >= 0);
+    });
+    $("rowEUR").hidden = draftCurs.indexOf("EUR") < 0;
+    $("rowUSD").hidden = draftCurs.indexOf("USD") < 0;
+  }
   function setTitle(sec) {
     var el = $("setTitle");
     el.textContent = t(SEC[sec][1]);
     if (sec === "cur" || sec === "lang") {
       var i = mkInfo(sec); i.setAttribute("aria-label", t("explain"));
-      el.insertBefore(i, el.firstChild);
+      el.appendChild(i);
     }
   }
   function openSettings(sec) {
     closeMenu(); hideTip();
     curSec = sec;
-    snap = { fb: $("fb").value, fs: $("fs").value, bk: $("bk").value, bm: baridiOn };
-    draftCur = curr; draftLang = lang;
-    segUI("curSeg", draftCur); segUI("langSeg", draftLang);
+    snap = { bm: baridiOn };
+    SNAPF.forEach(function (id) { snap[id] = $(id).value; });
+    draftCurs = curs.slice(); draftLang = lang;
+    multiUI(); segUI("langSeg", draftLang);
     Object.keys(SEC).forEach(function (k) { $(SEC[k][0]).hidden = k !== sec; });
     setTitle(sec);
     $("settingsPage").hidden = false;
@@ -1098,64 +1548,70 @@
   }
   function cancelSettings() {
     if (snap) {
-      $("fb").value = snap.fb; $("fs").value = snap.fs; $("bk").value = snap.bk; baridiOn = snap.bm;
-      syncFeeUI(); calc(); calcTarget();
+      SNAPF.forEach(function (id) { $(id).value = snap[id]; });
+      baridiOn = snap.bm;
+      syncFeeUI(); recalcAll();
     }
     closeSettings();
   }
   function saveSettings() {
-    var changed = draftCur !== curr || draftLang !== lang;
-    curr = draftCur; lang = draftLang;
+    curs = CUR.filter(function (c) { return draftCurs.indexOf(c) >= 0; });
+    if (!curs.length) curs = ["DZD"];
+    lang = draftLang;
+    fixSel();
     persist();
     closeSettings();
-    if (changed) applyI18n(); else { calc(); calcTarget(); }
+    applyI18n();
     toast(t("toast_saved"));
   }
   function resetSettings() {
     if (curSec === "fees") {
-      $("fb").value = "0,2"; $("fs").value = "0,2"; $("bk").value = "0,00"; baridiOn = true;
-      syncFeeUI(); calc(); calcTarget();
-    } else if (curSec === "cur") { draftCur = "DZD"; segUI("curSeg", draftCur); }
-    else if (curSec === "lang") { draftLang = "ar"; segUI("langSeg", draftLang); }
+      $("fb").value = "0,2"; $("fs").value = "0,2";
+      ["eb", "es", "ub", "us"].forEach(function (id) { $(id).value = "0"; });
+      $("ebk").value = "0,00"; $("ubk").value = "0,00";
+      baridiOn = true;
+      syncFeeUI(); recalcAll();
+    } else if (curSec === "cur") {
+      draftCurs = ["DZD"]; $("rEUR").value = "275"; $("rUSD").value = "";
+      multiUI(); recalcAll();
+    } else if (curSec === "lang") { draftLang = "ar"; segUI("langSeg", draftLang); }
   }
   $("setBack").addEventListener("click", cancelSettings);
   $("setSave").addEventListener("click", saveSettings);
   $("setReset").addEventListener("click", resetSettings);
   $("bm").addEventListener("change", function () {
     baridiOn = this.checked;
-    syncFeeUI();
-    calc(); calcTarget();
+    syncFeeUI(); recalcAll();
   });
   $("curSeg").addEventListener("click", function (e) {
     var b = e.target.closest("button"); if (!b) return;
-    draftCur = b.getAttribute("data-v"); segUI("curSeg", draftCur);
+    var v = b.getAttribute("data-v"), i = draftCurs.indexOf(v);
+    if (i >= 0) { if (draftCurs.length > 1) draftCurs.splice(i, 1); } else draftCurs.push(v);
+    multiUI();
   });
   $("langSeg").addEventListener("click", function (e) {
     var b = e.target.closest("button"); if (!b) return;
     draftLang = b.getAttribute("data-v"); segUI("langSeg", draftLang);
   });
   function syncFeeUI() {
-    var dz = curr === "DZD";
     $("bm").checked = baridiOn;
-    $("bmTable").hidden = !dz;
     $("bmTable").classList.toggle("off", !baridiOn);
-    $("bkRow").hidden = dz;
-    $("bk").disabled = !baridiOn;
+    $("feesDZD").hidden = curs.indexOf("DZD") < 0;
+    $("feesEUR").hidden = curs.indexOf("EUR") < 0;
+    $("feesUSD").hidden = curs.indexOf("USD") < 0;
     syncBuyFee();
   }
 
-  /* ---------- تطبيق اللغة والعملة ---------- */
+  /* ---------- تطبيق اللغة والعملات ---------- */
   function applyI18n() {
     hideTip();
     var h = document.documentElement;
     h.lang = lang; h.dir = lang === "ar" ? "rtl" : "ltr";
     document.title = t("title");
-    Array.prototype.forEach.call(document.querySelectorAll("[data-i18n]"), function (el) {
-      el.textContent = t(el.getAttribute("data-i18n"));
-    });
-    Array.prototype.forEach.call(document.querySelectorAll("[data-unit]"), function (el) { el.textContent = unit(); });
+    fixSel();
+    refreshTexts();
     $("settingsBtn").setAttribute("aria-label", t("settings")); $("settingsBtn").title = t("settings");
-    $("tabs").setAttribute("aria-label", t("pages"));
+    $("tabs").setAttribute("aria-label", t("pages")); $("bnav").setAttribute("aria-label", t("pages"));
     $("langSeg").setAttribute("aria-label", t("sec_lang"));
     $("curSeg").setAttribute("aria-label", t("sec_cur"));
     $("logs").setAttribute("aria-label", t("log_title"));
@@ -1164,10 +1620,10 @@
       b.setAttribute("aria-label", t(b.getAttribute("data-dir") === "up" ? "up" : "down"));
     });
     Array.prototype.forEach.call(document.querySelectorAll(".copy-btn"), function (b) { b.setAttribute("aria-label", t("copy_value")); });
-    $("menuCur").textContent = curr === "EUR" ? "€" : curr === "USD" ? "$" : "DZD";
+    $("menuCur").textContent = curs.map(sym).join(" · ");
     $("menuLang").textContent = { ar: "عربي", fr: "Français", en: "English" }[lang];
     $("setBack").setAttribute("aria-label", t("back"));
-    segUI("langSeg", lang); segUI("curSeg", curr);
+    draftCurs = curs.slice(); multiUI(); segUI("langSeg", lang);
     syncFeeUI();
     renderBmTable();
     calc(); calcTarget(); renderLog();
